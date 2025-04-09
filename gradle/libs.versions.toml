@@ -3,6 +3,7 @@ agp = "8.6.1"
 coilCompose = "3.1.0"
 compiler = "1.5.15"
 constraintlayoutCompose = "1.1.1"
+core = "1.48.0"
 gridlayout = "1.0.0"
 hiltAndroid = "2.55"
 hiltNavigationCompose = "1.2.0"
@@ -21,6 +22,7 @@ moshiKotlinCodegen = "1.15.2"
 navVersion = "2.8.9"
 okhttp = "4.12.0"
 protobufJavalite = "3.21.2"
+sceneview = "2.2.1"
 serialVersion = "2.1.0"
 argsVersion = "2.8.9"
 jsonVersion = "1.8.0"
@@ -59,6 +61,7 @@ androidx-ui-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref =
 androidx-ui-tooling-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "uiToolingPreview" }
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coilCompose" }
 coil-network-okhttp = { module = "io.coil-kt.coil3:coil-network-okhttp", version.ref = "coilCompose" }
+core = { module = "com.google.ar:core", version.ref = "core" }
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "hiltAndroid" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
@@ -89,6 +92,7 @@ glide = { group = "com.github.bumptech.glide", name = "glide", version.ref = "gl
 retrofit2-converter-moshi = { module = "com.squareup.retrofit2:converter-moshi", version.ref = "retrofitVersion" }
 androidx-material3-android = { group = "androidx.compose.material3", name = "material3-android", version.ref = "material3Android" }
 androidx-ui-core = { group = "androidx.privacysandbox.ui", name = "ui-core", version.ref = "uiCore" }
+sceneview = { module = "io.github.sceneview:sceneview", version.ref = "sceneview" }
 
 [plugins]
 ksp = { id = "com.google.devtools.ksp", version.ref = "kspVersion" }

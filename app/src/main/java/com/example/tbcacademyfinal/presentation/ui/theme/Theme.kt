@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.ui.theme
+package com.example.tbcacademyfinal.presentation.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme

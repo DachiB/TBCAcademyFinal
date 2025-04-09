@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.ui.theme
+package com.example.tbcacademyfinal.presentation.ui.theme
 
 import androidx.compose.ui.graphics.Color
 

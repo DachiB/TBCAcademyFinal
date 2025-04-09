@@ -97,6 +97,8 @@ dependencies {
     implementation(libs.androidx.paging.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.constraintlayout.compose)
+    implementation(libs.sceneview)
+    implementation(libs.core)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
     ksp(libs.moshi.kotlin.codegen.v1140)
