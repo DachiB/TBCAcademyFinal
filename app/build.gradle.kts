@@ -47,11 +47,11 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
 }
 
@@ -65,7 +65,6 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.core)
-    implementation(libs.sceneform.core)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.gridlayout)
     implementation(libs.androidx.core.ktx)
@@ -99,8 +98,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.sceneview)
-    implementation("com.gorisse.thomas.sceneform:sceneform:1.23.0")
-    implementation(libs.core)
+    implementation(libs.ar.core)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
     ksp(libs.moshi.kotlin.codegen.v1140)

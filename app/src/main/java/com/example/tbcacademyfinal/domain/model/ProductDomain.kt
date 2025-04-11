@@ -1,7 +1,7 @@
 package com.example.tbcacademyfinal.domain.model
 
 data class ProductDomain(
-    val id: String,
+    val id: Int,
     val name: String,
     val thumbnailUrl: String,
     val model3DUrl: String
