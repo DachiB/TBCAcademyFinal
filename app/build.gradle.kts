@@ -8,15 +8,16 @@ plugins {
     alias(libs.plugins.hilt)
     id("kotlin-parcelize")
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.google.services)
 }
 
 android {
 
-    namespace = "com.example.mainapplication"
+    namespace = "com.example.tbcacademyfinal"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.mainapplication"
+        applicationId = "com.example.tbcacademyfinal"
         minSdk = 24
         targetSdk = 35
         versionCode = 1
@@ -99,6 +100,8 @@ dependencies {
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.sceneview)
     implementation(libs.ar.core)
+    implementation(platform(libs.firebase.bom))
+    implementation(libs.firebase.auth.ktx)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
     ksp(libs.moshi.kotlin.codegen.v1140)

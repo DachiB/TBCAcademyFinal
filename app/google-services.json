@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "512363779950",
+    "project_id": "tbc-academy-final-ardesigner",
+    "storage_bucket": "tbc-academy-final-ardesigner.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:512363779950:android:e7a116119a69acfac0d37f",
+        "android_client_info": {
+          "package_name": "com.example.tbcacademyfinal"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAOMVcJV-dqs5rg5Jx-7hSqbCB6Oia0prs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
