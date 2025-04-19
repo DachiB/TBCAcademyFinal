@@ -6,8 +6,9 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.compose.rememberNavController
 import com.example.tbcacademyfinal.presentation.navigation.AppNavGraph
-import com.example.tbcacademyfinal.presentation.ui.theme.TBCAcademyFinalTheme
+import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -17,7 +18,8 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             TBCAcademyFinalTheme {
-                AppNavGraph()
+                val navController = rememberNavController()
+                AppNavGraph(navController)
             }
         }
     }
@@ -27,5 +29,5 @@ class MainActivity : ComponentActivity() {
 @Preview(showBackground = true)
 @Composable
 fun Preview() {
-    AppNavGraph()
+    AppNavGraph(navController = rememberNavController())
 }
