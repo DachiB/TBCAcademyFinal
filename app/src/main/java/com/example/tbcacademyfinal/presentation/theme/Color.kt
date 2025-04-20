@@ -2,10 +2,22 @@ package com.example.tbcacademyfinal.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+// Suggested Palette
+val CreamWhite = Color(0xFFFAF7F0)
+val ForestGreen = Color(0xFF3A5A40)
+val WalnutBrown = Color(0xFF7C5C46)
+val GoldAccent = Color(0xFFDAA520)
+val DarkSurface = Color(0xFF1C1B1F) // Example Dark theme surface
+val DarkBackground = Color(0xFF121212) // Example Dark theme background
+val GreenVariant = Color(0xFF588157) // Lighter green for accents/secondary
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Add other specific colors as needed (Error, OnPrimary, OnSecondary etc.)
+val LightOnError = Color.White
+val LightError = Color(0xFFB00020)
+val DarkError = Color(0xFFCF6679)
+val DarkOnError = Color.Black
+
+// You can also define the original White, Green, Light Brown here if preferred
+// val PureWhite = Color(0xFFFFFFFF)
+// val AppGreen = Color(0xFF<YourGreenHex>)
+// val LightBrown = Color(0xFF<YourBrownHex>)

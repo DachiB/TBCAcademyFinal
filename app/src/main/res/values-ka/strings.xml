@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">AR Home Designer</string>
+    <string name="hint_email">შეიყვანე შენი იმეილი</string>
+    <string name="landing_image_description">AR Designer Image</string>
+    <string name="landing_description">ლენდინგის აღწერა</string>
+    <string name="landing_get_started">დაწყება</string>
+    <string name="hide_password">პაროლის დამალვა</string>
+    <string name="show_password">აჩვენე პაროლი</string>
+    <string name="password_label">შეიყვანე შენი პაროლი</string>
+    <string name="login_button">შესვლა</string>
+    <string name="register_prompt">არგაქვს ექუნთი? დააჭირე აქ</string>
+    <string name="email_label">შეიყვანე შენი იმეილი</string>
+    <string name="login_title">ლოგინი</string>
+</resources>

@@ -58,11 +58,14 @@ android {
         jvmTarget = "17"
     }
 
-//    packaging {
+    packaging {
 //        resources {
 //            excludes += "/META-INF/{AL2.0,LGPL2.1}"
 //        }
-//    }
+        jniLibs.pickFirsts.add("lib/**/libarcore_sdk_c.so")
+        jniLibs.pickFirsts.add("lib/**/libarcore_sdk_java.so")
+    }
+
     //NO Compress?
 }
 
