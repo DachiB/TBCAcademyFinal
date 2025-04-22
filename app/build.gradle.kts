@@ -1,5 +1,3 @@
-import com.android.build.api.dsl.AaptOptions
-import com.android.build.api.dsl.Packaging
 
 plugins {
     alias(libs.plugins.android.application)
@@ -80,6 +78,7 @@ dependencies {
     implementation(libs.androidx.material3.android)
     implementation(libs.androidx.ui.core)
     implementation(libs.datastore)
+    implementation(libs.androidx.espresso.core)
     debugImplementation(libs.androidx.ui.tooling)
     implementation(libs.androidx.gridlayout)
     implementation(libs.androidx.core.ktx)

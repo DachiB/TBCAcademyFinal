@@ -1,4 +1,7 @@
 package com.example.tbcacademyfinal.presentation.ui.auth.register
 
-class RegisterSideEffect {
+sealed interface RegisterSideEffect {
+    data class ShowError(val message: String) : RegisterSideEffect
+    data object NavigateBackToLogin : RegisterSideEffect
+    data object NavigateToMain : RegisterSideEffect // After successful registration
 }

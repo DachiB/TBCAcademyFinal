@@ -5,6 +5,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.example.tbcacademyfinal.presentation.ui.auth.login.LoginScreen
+import com.example.tbcacademyfinal.presentation.ui.auth.register.RegisterScreen
 import com.example.tbcacademyfinal.presentation.ui.landing.LandingScreen
 import com.example.tbcacademyfinal.presentation.ui.splash.SplashScreen
 
@@ -24,7 +25,7 @@ fun AppNavGraph(
                     }
                 },
                 onNavigateToAuth = {
-                    navController.navigate(Routes.AuthGraphRoute) {
+                    navController.navigate(Routes.LoginRoute) {
                         popUpTo(Routes.SplashRoute) { inclusive = true }
                     }
                 },
@@ -57,6 +58,18 @@ fun AppNavGraph(
                     navController.navigate(Routes.RegisterRoute)
                 }
             )
+        }
+        composable<Routes.RegisterRoute> {
+             RegisterScreen(
+                 onRegisterSuccess = {
+                     navController.navigate(Routes.MainGraphRoute) {
+                         popUpTo(Routes.RegisterRoute) { inclusive = true }
+                     }
+                 },
+                 onNavigateBackToLogin = {
+                     navController.popBackStack()
+                 }
+             )
         }
 
         // Authentication Graph

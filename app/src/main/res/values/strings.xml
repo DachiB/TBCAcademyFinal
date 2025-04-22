@@ -11,4 +11,10 @@
     <string name="register_prompt">Don\'t have account? Click Here</string>
     <string name="email_label">Enter Your Email</string>
     <string name="login_title">Login</string>
+    <string name="register_title">Register</string>
+    <string name="navigate_back">Navigate Back</string>
+    <string name="back_button">Back</string>
+    <string name="confirm_password_label">Confirm your password</string>
+    <string name="register_button">Register</string>
+    <string name="login_prompt">Have an account already? Click Here!</string>
 </resources>
