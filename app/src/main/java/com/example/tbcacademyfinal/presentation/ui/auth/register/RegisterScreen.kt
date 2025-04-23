@@ -47,7 +47,6 @@ import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import com.example.tbcacademyfinal.util.CollectSideEffect
 
-// ... (imports remain the same)
 
 @Composable
 fun RegisterScreen(
@@ -184,7 +183,7 @@ fun RegisterScreenContent(
             )
 
             // Error message display remains the same
-            val errorMessage =  state.errorMessage
+            val errorMessage = state.errorMessage
             if (errorMessage != null) {
                 Text(
                     text = errorMessage,

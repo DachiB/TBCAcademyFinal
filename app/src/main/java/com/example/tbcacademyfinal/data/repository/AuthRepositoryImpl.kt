@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
+import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -35,29 +36,42 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: FirebaseAuthInvalidCredentialsException) {
             emit(Resource.Error("Invalid email or password."))
         } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred during login.", e))
+            emit(
+                Resource.Error(
+                    e.localizedMessage ?: "An unexpected error occurred during login.",
+                    e
+                )
+            )
         }
     }.flowOn(Dispatchers.IO) // Perform network/auth operations on IO dispatcher
 
-    override suspend fun register(email: String, password: String): Flow<Resource<AuthResult>> = flow {
-        emit(Resource.Loading)
-        try {
-            val result = auth.createUserWithEmailAndPassword(email, password).await()
-            emit(Resource.Success(result))
-        } catch (e: FirebaseAuthWeakPasswordException) {
-            emit(Resource.Error("Password is too weak. Please choose a stronger password."))
-        } catch (e: FirebaseAuthInvalidCredentialsException) {
-            // Although less likely for registration, handle it just in case (e.g., malformed email)
-            emit(Resource.Error("Invalid email format."))
-        } catch (e: FirebaseAuthUserCollisionException) {
-            emit(Resource.Error("An account with this email already exists."))
-        } catch (e: Exception) {
-            emit(Resource.Error(e.localizedMessage ?: "An unexpected error occurred during registration.", e))
-        }
-    }.flowOn(Dispatchers.IO) // Perform network/auth operations on IO dispatcher
+    override suspend fun register(email: String, password: String): Flow<Resource<AuthResult>> =
+        flow {
+            emit(Resource.Loading)
+            try {
+                val result = auth.createUserWithEmailAndPassword(email, password).await()
+                emit(Resource.Success(result))
+            } catch (e: FirebaseAuthWeakPasswordException) {
+                emit(Resource.Error("Password is too weak. Please choose a stronger password."))
+            } catch (e: FirebaseAuthInvalidCredentialsException) {
+                // Although less likely for registration, handle it just in case (e.g., malformed email)
+                emit(Resource.Error("Invalid email format."))
+            } catch (e: FirebaseAuthUserCollisionException) {
+                emit(Resource.Error("An account with this email already exists."))
+            } catch (e: Exception) {
+                emit(
+                    Resource.Error(
+                        e.localizedMessage ?: "An unexpected error occurred during registration.", e
+                    )
+                )
+            }
+        }.flowOn(Dispatchers.IO) // Perform network/auth operations on IO dispatcher
 
     override suspend fun logout() {
         auth.signOut()
-        // No return needed, sign out is fire-and-forget
+    }
+
+    override suspend fun getCurrentUser(): FirebaseUser? {
+        return auth.currentUser
     }
 }

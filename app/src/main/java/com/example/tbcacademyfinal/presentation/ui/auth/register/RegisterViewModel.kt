@@ -2,7 +2,7 @@ package com.example.tbcacademyfinal.presentation.ui.auth.register
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tbcacademyfinal.domain.repository.AuthRepository
+import com.example.tbcacademyfinal.domain.usecase.auth.RegisterUserUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidateEmailUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordsMatchUseCase
@@ -19,7 +19,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegisterViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val registerUserUseCase: RegisterUserUseCase,
     private val validateEmailUseCase: ValidateEmailUseCase,
     private val validatePasswordUseCase: ValidatePasswordUseCase,
     private val validatePasswordsMatchUseCase: ValidatePasswordsMatchUseCase
@@ -99,17 +99,29 @@ class RegisterViewModel @Inject constructor(
         _state.update { it.copy(isLoading = true, errorMessage = null) }
 
         viewModelScope.launch {
-            authRepository.register(email, password).collect { resource ->
+            registerUserUseCase(email, password).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> _state.update { it.copy(isLoading = true) }
                     is Resource.Success -> {
-                        _state.update { it.copy(isLoading = false, isRegisterSuccess = true, errorMessage = null) }
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                isRegisterSuccess = true,
+                                errorMessage = null
+                            )
+                        }
                         _event.tryEmit(RegisterSideEffect.NavigateToMain)
                     }
+
                     is Resource.Error -> {
-                        _state.update { it.copy(isLoading = false, errorMessage = resource.message) }
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = resource.message
+                            )
+                        }
                         // Optionally emit event
-                        // _event.tryEmit(RegisterSideEffect.ShowError(resource.message))
+//                        _event.tryEmit(RegisterSideEffect.ShowError(resource.message))
                     }
                 }
             }

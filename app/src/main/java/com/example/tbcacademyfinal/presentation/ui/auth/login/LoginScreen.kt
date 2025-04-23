@@ -45,7 +45,7 @@ import com.example.tbcacademyfinal.util.CollectSideEffect
 @Composable
 fun LoginScreen(
     viewModel: LoginViewModel = hiltViewModel(),
-    onLoginSuccess: () -> Unit,
+    onNavigateToMain: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -54,7 +54,7 @@ fun LoginScreen(
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
             is LoginSideEffect.NavigateToRegister -> onNavigateToRegister()
-            is LoginSideEffect.NavigateToMain -> onLoginSuccess()
+            is LoginSideEffect.NavigateToMain -> onNavigateToMain()
             is LoginSideEffect.ShowError -> {
                 println("Error: ${effect.message}") // Handle error display
             }

@@ -1,10 +1,8 @@
-
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.safeargs)
     alias(libs.plugins.plugin.serializations)
-    alias(libs.plugins.protobuf)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     id("kotlin-parcelize")
@@ -56,10 +54,11 @@ android {
         jvmTarget = "17"
     }
 
-    packaging {
-//        resources {
-//            excludes += "/META-INF/{AL2.0,LGPL2.1}"
-//        }
+    packaging { // KEEP THIS BLOCK
+        resources {
+            pickFirsts += "google/protobuf/descriptor.proto"
+            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+        }
         jniLibs.pickFirsts.add("lib/**/libarcore_sdk_c.so")
         jniLibs.pickFirsts.add("lib/**/libarcore_sdk_java.so")
     }
@@ -90,6 +89,7 @@ dependencies {
     implementation(libs.navigation.ui)
     implementation(libs.kotlinx.serialization)
     implementation(libs.retrofit)
+    implementation(libs.play.services.maps)
     implementation(libs.converter.gson)
     implementation(libs.kotlinx.coroutines)
     implementation(libs.okhttp)
@@ -97,10 +97,8 @@ dependencies {
     implementation(libs.glide)
     implementation(libs.androidx.room.ktx)
     implementation(libs.paging)
-    implementation(libs.datastore)
     implementation(libs.kotlinx.coroutines.core)
     implementation(libs.androidx.datastore)
-    implementation(libs.protobuf.javalite)
     implementation(libs.retrofit2.converter.moshi)
     implementation(libs.moshi)
     implementation(libs.moshi.kotlin)
@@ -108,6 +106,7 @@ dependencies {
     implementation(libs.androidx.room.paging)
     implementation(libs.hilt.android)
     implementation(libs.coil.compose)
+    implementation(libs.firebase.firestore.ktx)
     implementation(libs.androidx.paging.compose)
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.constraintlayout.compose)
@@ -124,17 +123,3 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
 }
 
-protobuf {
-    protoc {
-        artifact = "com.google.protobuf:protoc:4.29.0"
-    }
-    generateProtoTasks {
-        all().configureEach {
-            plugins {
-                create("java") {
-                    option("lite")
-                }
-            }
-        }
-    }
-}

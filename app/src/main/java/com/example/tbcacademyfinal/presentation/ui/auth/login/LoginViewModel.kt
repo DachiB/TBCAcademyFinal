@@ -2,7 +2,7 @@ package com.example.tbcacademyfinal.presentation.ui.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tbcacademyfinal.domain.repository.AuthRepository
+import com.example.tbcacademyfinal.domain.usecase.auth.LoginUserUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidateEmailUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordUseCase
 import com.example.tbcacademyfinal.util.Resource
@@ -18,7 +18,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
-    private val authRepository: AuthRepository,
+    private val loginUserUseCase: LoginUserUseCase,
     private val validateEmailUseCase: ValidateEmailUseCase,
     private val validatePasswordUseCase: ValidatePasswordUseCase
 ) : ViewModel() {
@@ -80,15 +80,27 @@ class LoginViewModel @Inject constructor(
         _state.update { it.copy(isLoading = true, errorMessage = null) }
 
         viewModelScope.launch {
-            authRepository.login(email, password).collect { resource ->
+            loginUserUseCase(email, password).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> _state.update { it.copy(isLoading = true) } // Can keep updating loading just in case
                     is Resource.Success -> {
-                        _state.update { it.copy(isLoading = false, isLoginSuccess = true, errorMessage = null) }
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                isLoginSuccess = true,
+                                errorMessage = null
+                            )
+                        }
                         _event.tryEmit(LoginSideEffect.NavigateToMain)
                     }
+
                     is Resource.Error -> {
-                        _state.update { it.copy(isLoading = false, errorMessage = resource.message) }
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                errorMessage = resource.message
+                            )
+                        }
                     }
                 }
             }

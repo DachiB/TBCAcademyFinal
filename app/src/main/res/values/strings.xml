@@ -17,4 +17,16 @@
     <string name="confirm_password_label">Confirm your password</string>
     <string name="register_button">Register</string>
     <string name="login_prompt">Have an account already? Click Here!</string>
+    <string name="bottom_nav_store">Store</string>
+    <string name="bottom_nav_ar_collection">Collection</string>
+    <string name="bottom_nav_profile">Profile</string>
+    <string name="language_english">English Language</string>
+    <string name="language_georgian">Georgian Language</string>
+    <string name="profile_logout_button">Logout</string>
+    <string name="selected_option">Language</string>
+    <string name="profile_language_label">Languages</string>
+    <string name="profile_theme_label" translatable="false">Theme</string>
+    <string name="profile_email_label">Email</string>
+    <string name="profile_title">Profile Page</string>
+    <string name="profile_email_placeholder" translatable="false">N/A</string>
 </resources>

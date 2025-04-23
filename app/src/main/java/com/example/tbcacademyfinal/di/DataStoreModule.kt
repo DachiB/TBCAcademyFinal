@@ -36,4 +36,6 @@ object DataStoreModule {
     fun provideDataStoreRepository(dataStore: DataStore<Preferences>): DataStoreRepository {
         return DataStoreRepositoryImpl(dataStore)
     }
+
+
 }

@@ -12,4 +12,20 @@
     <string name="register_prompt">არგაქვს ექუნთი? დააჭირე აქ</string>
     <string name="email_label">შეიყვანე შენი იმეილი</string>
     <string name="login_title">ლოგინი</string>
+    <string name="register_title">რეგისტრაცია</string>
+    <string name="navigate_back">უკან დაბრუნება</string>
+    <string name="back_button">უკან</string>
+    <string name="confirm_password_label">გაიმეორე შენი პაროლი</string>
+    <string name="register_button">დარეგისტრირება</string>
+    <string name="login_prompt">გაქვს ანგარიში? დააჭირე აქ!</string>
+    <string name="bottom_nav_store">მაღაზია</string>
+    <string name="bottom_nav_ar_collection">კოლექცია</string>
+    <string name="bottom_nav_profile">პროფილი</string>
+    <string name="language_english">ინგლისური ენა</string>
+    <string name="language_georgian">ქართული ენა</string>
+    <string name="profile_logout_button">ანგარიშიდან გასვლა</string>
+    <string name="selected_option">ენა</string>
+    <string name="profile_language_label">ენები</string>
+    <string name="profile_email_label">იმეილი</string>
+    <string name="profile_title">პროფილი</string>
 </resources>
