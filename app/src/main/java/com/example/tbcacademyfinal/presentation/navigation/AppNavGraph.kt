@@ -6,7 +6,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import androidx.navigation.toRoute
 import com.example.tbcacademyfinal.presentation.ui.auth.login.LoginScreen
 import com.example.tbcacademyfinal.presentation.ui.auth.register.RegisterScreen
 import com.example.tbcacademyfinal.presentation.ui.landing.LandingScreen
@@ -140,6 +139,11 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 onNavigateBack = { navController.popBackStack() }, // Handle back navigation
                 // Pass main navController for navigating back etc.
             )
+        }
+        composable<Routes.ArSceneRoute> {
+//            ArSceneScreen(
+//                onNavigateBack = { navController.popBackStack() },
+//            )
         }
 
         // --- Note on Bottom Bar Destinations ---

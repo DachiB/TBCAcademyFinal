@@ -33,7 +33,10 @@ sealed class Routes {
     data class DetailsRoute(val productId: String) : Routes()
 
     @Serializable
-    data object ArCollectionRoute : Routes()
+    data object CollectionRoute : Routes()
+
+    @Serializable
+    data object ArSceneRoute : Routes()
 
     @Serializable
     data object ProfileRoute : Routes()

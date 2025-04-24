@@ -27,7 +27,7 @@ object DatabaseModule {
         )
             // Add migrations here if needed in the future:
             // .addMigrations(MIGRATION_1_2)
-            .fallbackToDestructiveMigration() // Simple fallback for now during development
+            .fallbackToDestructiveMigration(false) // Simple fallback for now during development
             .build()
     }
 

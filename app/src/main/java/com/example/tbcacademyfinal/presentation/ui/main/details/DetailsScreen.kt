@@ -159,7 +159,7 @@ fun ProductDetails(
                     clip = false // we’ll clip separately
                 )
                 .clip(MaterialTheme.shapes.large),
-            localContext = LocalContext
+            localContext = LocalContext.current
         )
 //        AsyncImage(
 //            model = ImageRequest.Builder(LocalContext.current)

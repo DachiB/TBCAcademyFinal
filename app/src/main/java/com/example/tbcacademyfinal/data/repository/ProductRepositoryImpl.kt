@@ -36,7 +36,7 @@ class ProductRepositoryImpl @Inject constructor(
             "Minimalist Lamp",
             "Sleek floor lamp.",
             149.50,
-            "https://example.com/images/lamp.jpg",
+            "https://www.ikea.com/us/en/images/products/arstid-floor-lamp-with-led-bulb-brass-white__0390610_pe566328_s5.jpg",
             "Lighting",
             "models/lamp.glb"
         ),

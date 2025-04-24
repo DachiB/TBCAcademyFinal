@@ -3,7 +3,6 @@ package com.example.tbcacademyfinal.presentation.ui.splash
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
-import com.example.tbcacademyfinal.presentation.navigation.Routes
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.delay
