@@ -4,7 +4,7 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
-import com.example.tbcacademyfinal.data.local.PreferencesKeys
+import com.example.tbcacademyfinal.data.local.keys.PreferencesKeys
 import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch

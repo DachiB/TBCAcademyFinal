@@ -92,7 +92,9 @@ fun MainScreen(
             }
             composable<Routes.ArCollectionRoute> {
                 // Pass the mainNavController if AR screen needs to navigate elsewhere (unlikely?)
-                ArCollectionScreen()
+                ArCollectionScreen(
+                    onNavigateToArScreen = {}
+                )
             }
             composable<Routes.ProfileRoute> {
                 // Pass the mainNavController for actions like logout (which navigates back to AuthGraph)

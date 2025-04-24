@@ -133,11 +133,11 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         }
 
         // Details Screen (Navigated to FROM StoreScreen, hence part of Main graph)
-        composable<Routes.DetailsRoute> { backStackEntry ->
+        composable<Routes.DetailsRoute> {
             // Use .toRoute() to get the type-safe argument object
-            val args = backStackEntry.toRoute<Routes.DetailsRoute>()
-            DetailsScreen( // Assuming DetailsScreen exists
-                productId = args.productId,
+            DetailsScreen(
+                // Assuming DetailsScreen exists
+                onNavigateBack = { navController.popBackStack() }, // Handle back navigation
                 // Pass main navController for navigating back etc.
             )
         }

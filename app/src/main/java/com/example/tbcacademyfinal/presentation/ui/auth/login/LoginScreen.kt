@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.twotone.Email
@@ -106,7 +107,8 @@ fun LoginScreenContent(
                 // Send EmailChanged intent on value change
                 onValueChange = { processIntent(LoginIntent.EmailChanged(it)) },
                 label = { Text(stringResource(R.string.email_label)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth(),
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.TwoTone.Email,

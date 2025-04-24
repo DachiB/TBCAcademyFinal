@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.data.local
+package com.example.tbcacademyfinal.data.local.keys
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey

@@ -1,10 +1,13 @@
 package com.example.tbcacademyfinal.di
 
+import com.example.tbcacademyfinal.data.local.dao.CollectionDao
 import com.example.tbcacademyfinal.data.remote.ProductApiService
 import com.example.tbcacademyfinal.data.repository.AuthRepositoryImpl
+import com.example.tbcacademyfinal.data.repository.CollectionRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.ProductRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.UserRepositoryImpl
 import com.example.tbcacademyfinal.domain.repository.AuthRepository
+import com.example.tbcacademyfinal.domain.repository.CollectionRepository
 import com.example.tbcacademyfinal.domain.repository.ProductRepository
 import com.example.tbcacademyfinal.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -38,5 +41,11 @@ object RepositoryModule {
     @Singleton
     fun provideUserRepository(firestore: FirebaseFirestore): UserRepository {
         return UserRepositoryImpl(firestore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideCollectionRepository(collectionDao: CollectionDao): CollectionRepository {
+        return CollectionRepositoryImpl(collectionDao)
     }
 }

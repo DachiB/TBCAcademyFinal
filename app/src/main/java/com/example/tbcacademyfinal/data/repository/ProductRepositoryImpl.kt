@@ -27,7 +27,7 @@ class ProductRepositoryImpl @Inject constructor(
             "Modern Sofa",
             "A comfy modern sofa.",
             1299.99,
-            "https://example.com/images/sofa.jpg",
+            "https://atlas-content-cdn.pixelsquid.com/stock-images/sofa-single-ywYZBl8-600.jpg",
             "Sofas",
             "models/sofa.glb"
         ),

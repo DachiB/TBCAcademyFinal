@@ -19,7 +19,7 @@
     <string name="register_button">დარეგისტრირება</string>
     <string name="login_prompt">გაქვს ანგარიში? დააჭირე აქ!</string>
     <string name="bottom_nav_store">მაღაზია</string>
-    <string name="bottom_nav_ar_collection">კოლექცია</string>
+    <string name="bottom_nav_ar_collection">AR კოლექცია</string>
     <string name="bottom_nav_profile">პროფილი</string>
     <string name="language_english">ინგლისური ენა</string>
     <string name="language_georgian">ქართული ენა</string>
@@ -28,4 +28,8 @@
     <string name="profile_language_label">ენები</string>
     <string name="profile_email_label">იმეილი</string>
     <string name="profile_title">პროფილი</string>
+    <string name="details_title">დეტალები</string>
+    <string name="details_added_to_collection">დაამატე კოლექციაში</string>
+    <string name="details_add_to_collection">დამატებულია კოლექციაში</string>
+    <string name="collection_clear_all">გაწმენდვა</string>
 </resources>

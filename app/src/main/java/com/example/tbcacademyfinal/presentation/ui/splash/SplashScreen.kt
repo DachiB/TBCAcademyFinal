@@ -8,7 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,8 +54,8 @@ fun SplashScreen(
                 colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary) // Tint logo with primary color
             )
             Spacer(modifier = Modifier.height(24.dp))
-            CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
+            LinearProgressIndicator(
+                modifier = Modifier.width(48.dp),
                 color = MaterialTheme.colorScheme.primary // Use primary color for indicator
             )
         }
