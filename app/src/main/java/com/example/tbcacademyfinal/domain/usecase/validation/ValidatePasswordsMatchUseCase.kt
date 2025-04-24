@@ -1,6 +1,5 @@
 package com.example.tbcacademyfinal.domain.usecase.validation
 
-import com.example.tbcacademyfinal.domain.model.ValidationResult
 import com.example.tbcacademyfinal.util.Resource
 import javax.inject.Inject
 

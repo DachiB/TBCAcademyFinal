@@ -2,7 +2,7 @@ package com.example.tbcacademyfinal.di
 
 import com.example.tbcacademyfinal.data.remote.ProductApiService
 import com.example.tbcacademyfinal.data.repository.AuthRepositoryImpl
-import com.example.tbcacademyfinal.data.repository.ProductRepositoryRemoteImpl
+import com.example.tbcacademyfinal.data.repository.ProductRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.UserRepositoryImpl
 import com.example.tbcacademyfinal.domain.repository.AuthRepository
 import com.example.tbcacademyfinal.domain.repository.ProductRepository
@@ -22,10 +22,11 @@ object RepositoryModule {
     @Provides
     @Singleton
     fun provideProductRepository(
-        productApiService: ProductApiService
+        apiService: ProductApiService
     ): ProductRepository {
-        return ProductRepositoryRemoteImpl(productApiService)
+        return ProductRepositoryImpl(apiService)
     }
+
 
     @Provides
     @Singleton // Or @ViewModelScoped

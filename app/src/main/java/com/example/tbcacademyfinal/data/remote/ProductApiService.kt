@@ -1,9 +1,17 @@
 package com.example.tbcacademyfinal.data.remote
 
 import com.example.tbcacademyfinal.data.model.ProductDto
+import retrofit2.Response
 import retrofit2.http.GET
+import retrofit2.http.Path
 
 interface ProductApiService {
-    @GET("7e4e2812-dd3c-467b-a04e-95b0231f0d6d") // Adjust the endpoint as necessary.
-    suspend fun getProducts(): List<ProductDto>
+
+    // Example endpoint for getting all products
+    @GET("api/products") // Adjust path based on your mock API or real endpoint
+    suspend fun getProducts(): Response<List<ProductDto>> // Return list of DTOs
+
+    // Example endpoint for getting a single product by ID
+    @GET("api/products/{productId}")
+    suspend fun getProductById(@Path("productId") id: String): Response<ProductDto>
 }

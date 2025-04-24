@@ -3,10 +3,12 @@ package com.example.tbcacademyfinal.data.model
 import com.squareup.moshi.Json
 
 data class ProductDto(
-    val id: Int,
-    val name: String,
-    @Json(name = "thumbnail_url")
-    val thumbnailUrl: String,
-    @Json(name = "model_3d_url")
-    val model3DUrl: String
+    @Json(name = "id") val id: String?, // Use Json from Moshi or SerializedName from Gson
+    @Json(name = "name") val name: String?,
+    @Json(name = "description") val description: String?,
+    @Json(name = "price") val price: Double?,
+    @Json(name = "image_url") val imageUrl: String?,
+    @Json(name = "category") val category: String?,
+    @Json(name = "model_file") val modelFile: String? // Asset path for AR model
+    // Add other fields as needed from API
 )
