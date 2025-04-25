@@ -1,5 +1,6 @@
 package com.example.tbcacademyfinal.presentation.ui.main.ar_scene
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -110,6 +111,8 @@ fun ArScreenContent(
         }
         var frame by remember { mutableStateOf<Frame?>(null) }
 
+        var currentModelFile by remember { mutableStateOf("models/lamp.glb") }
+
         ARScene(
             modifier = Modifier.fillMaxSize(),
             childNodes = childNodes,
@@ -143,7 +146,8 @@ fun ArScreenContent(
                                 engine = engine,
                                 modelLoader = modelLoader,
                                 materialLoader = materialLoader,
-                                anchor = anchor
+                                anchor = anchor,
+                                currentModelFile = currentModelFile
                             )
                         }
                 }
@@ -165,6 +169,7 @@ fun ArScreenContent(
                                     modelLoader = modelLoader,
                                     materialLoader = materialLoader,
                                     anchor = anchor,
+                                    currentModelFile = currentModelFile
                                 )
                             }
                     }
@@ -242,7 +247,13 @@ fun ArScreenContent(
                         CollectionThumbnail(
                             item = item,
                             isSelected = state.selectedItemModelFile == item.modelFile,
-                            onClick = { onIntent(ArSceneIntent.SelectItemToPlace(item)) }
+                            onClick = {
+                                Log.d(
+                                    "ArScreen",
+                                    "Clicked item: ${item.name}, Model: ${item.modelFile}"
+                                )
+                                currentModelFile = item.modelFile
+                            }
                         )
                     }
                 }
@@ -293,16 +304,18 @@ fun createAnchorNode(
     engine: Engine,
     modelLoader: ModelLoader,
     materialLoader: MaterialLoader,
-    anchor: Anchor
+    anchor: Anchor,
+    currentModelFile: String = "models/lamp.glb"
 ): AnchorNode {
     val anchorNode = AnchorNode(engine = engine, anchor = anchor)
     val modelNode = ModelNode(
-        modelInstance = modelLoader.createModelInstance("models/lamp.glb"),
+        modelInstance = modelLoader.createModelInstance(currentModelFile),
         // Scale to fit in a 0.5 meters cube
         scaleToUnits = 0.5f
     ).apply {
         // Model Node needs to be editable for independent rotation from the anchor rotation
         isEditable = true
+        isScaleEditable = true
         editableScaleRange = 0.2f..0.75f
     }
     val boundingBoxNode = CubeNode(
