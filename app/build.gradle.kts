@@ -56,7 +56,6 @@ android {
 
     packaging { // KEEP THIS BLOCK
         resources {
-            pickFirsts += "google/protobuf/descriptor.proto"
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
         jniLibs.pickFirsts.add("lib/**/libarcore_sdk_c.so")
@@ -111,6 +110,7 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.sceneview)
+    implementation("io.github.sceneview:arsceneview:2.3.0")
     implementation(libs.ar.core)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)

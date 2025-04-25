@@ -10,6 +10,7 @@ import com.example.tbcacademyfinal.presentation.ui.auth.login.LoginScreen
 import com.example.tbcacademyfinal.presentation.ui.auth.register.RegisterScreen
 import com.example.tbcacademyfinal.presentation.ui.landing.LandingScreen
 import com.example.tbcacademyfinal.presentation.ui.main.MainScreen
+import com.example.tbcacademyfinal.presentation.ui.main.ar_scene.ArSceneScreen
 import com.example.tbcacademyfinal.presentation.ui.main.details.DetailsScreen
 import com.example.tbcacademyfinal.presentation.ui.splash.SplashScreen
 
@@ -141,9 +142,9 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
             )
         }
         composable<Routes.ArSceneRoute> {
-//            ArSceneScreen(
-//                onNavigateBack = { navController.popBackStack() },
-//            )
+            ArSceneScreen(
+                onNavigateBack = { navController.popBackStack() },
+            )
         }
 
         // --- Note on Bottom Bar Destinations ---

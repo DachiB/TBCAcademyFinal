@@ -1,5 +1,6 @@
 package com.example.tbcacademyfinal.presentation.ui.main.ar_scene
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.domain.usecase.collection.GetCollectionItemsUseCase
@@ -83,6 +84,7 @@ class ArSceneViewModel @Inject constructor(
     }
 
     private fun selectItem(item: CollectionItemUi) {
+        Log.d("ArScreen", "Selecting item: ${item.name}, Model: ${item.modelFile}")
         _state.update { it.copy(selectedItemModelFile = item.modelFile) }
         updateInstructionText() // Update text to prompt placement
     }

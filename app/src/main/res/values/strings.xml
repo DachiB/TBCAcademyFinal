@@ -36,4 +36,6 @@
     <string name="collection_start_decorating">Start Decorating</string>
     <string name="collection_empty_message">List is empty</string>
     <string name="collection_remove_item">Remove Item</string>
+    <string name="point_your_phone_down">Point your phone down at an empty space, and move it around slowly</string>
+    <string name="tap_anywhere_to_add_model">Tap anywhere to add model\n</string>
 </resources>

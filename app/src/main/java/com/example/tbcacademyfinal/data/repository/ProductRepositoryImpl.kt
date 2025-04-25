@@ -29,7 +29,7 @@ class ProductRepositoryImpl @Inject constructor(
             1299.99,
             "https://atlas-content-cdn.pixelsquid.com/stock-images/sofa-single-ywYZBl8-600.jpg",
             "Sofas",
-            "models/sofa.glb"
+            "models/damaged_helmet.glb"
         ),
         ProductDto(
             "p2",
