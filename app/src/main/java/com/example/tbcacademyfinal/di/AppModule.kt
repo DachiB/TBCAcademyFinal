@@ -19,6 +19,5 @@ object AppModule {
     fun provideApplication(@ApplicationContext app: Context): MyApplication {
         return app as MyApplication
     }
-
     // Provide other app-level singletons if needed
 }

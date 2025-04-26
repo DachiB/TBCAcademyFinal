@@ -31,11 +31,6 @@ object DataStoreModule {
         // scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     }
 
-    @Singleton
-    @Provides
-    fun provideDataStoreRepository(dataStore: DataStore<Preferences>): DataStoreRepository {
-        return DataStoreRepositoryImpl(dataStore)
-    }
 
 
 }

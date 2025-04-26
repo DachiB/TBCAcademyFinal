@@ -51,19 +51,41 @@ class RegisterViewModel @Inject constructor(
     private fun updateEmail(email: String) {
         val emailValidation = validateEmailUseCase(email)
         val errorMessage = if (emailValidation is Resource.Error) emailValidation.message else null
-        _state.update { it.copy(email = email, errorMessage = errorMessage) }
+        _state.update { it.copy(email = email, emailError = errorMessage) }
     }
 
     private fun updatePassword(password: String) {
         val passwordValidation = validatePasswordUseCase(password)
-        val errorMessage = if (passwordValidation is Resource.Error) passwordValidation.message else null
-        _state.update { it.copy(password = password, errorMessage = errorMessage) }
+        val confirmPasswordValidation =
+            validatePasswordsMatchUseCase(password, state.value.confirmPassword)
+        val passwordError =
+            if (passwordValidation is Resource.Error) passwordValidation.message else null
+        val confirmPasswordError =
+            if (confirmPasswordValidation is Resource.Error) confirmPasswordValidation.message else null
+        _state.update {
+            it.copy(
+                password = password,
+                passwordError = passwordError,
+                confirmPasswordError = confirmPasswordError
+            )
+        }
     }
 
     private fun updateConfirmPassword(confirmPassword: String) {
-        val matchValidation = validatePasswordsMatchUseCase(state.value.password, confirmPassword)
-        val errorMessage = if (matchValidation is Resource.Error) matchValidation.message else null
-        _state.update { it.copy(confirmPassword = confirmPassword, errorMessage = errorMessage) }
+        val passwordValidation = validatePasswordUseCase(state.value.password)
+        val confirmPasswordValidation =
+            validatePasswordsMatchUseCase(state.value.password, confirmPassword)
+        val passwordError =
+            if (passwordValidation is Resource.Error) passwordValidation.message else null
+        val confirmPasswordError =
+            if (confirmPasswordValidation is Resource.Error) confirmPasswordValidation.message else null
+        _state.update {
+            it.copy(
+                confirmPassword = confirmPassword,
+                passwordError = passwordError,
+                confirmPasswordError = confirmPasswordError,
+                )
+        }
     }
 
     private fun updatePasswordVisibility() {
@@ -84,25 +106,25 @@ class RegisterViewModel @Inject constructor(
         // --- Run Validations ---
         val emailValidation = validateEmailUseCase(email)
         if (emailValidation is Resource.Error) {
-            _state.update { it.copy(errorMessage = emailValidation.message) }
+            _state.update { it.copy(serverErrorMessage = emailValidation.message) }
             return
         }
 
         val passwordValidation = validatePasswordUseCase(password)
         if (passwordValidation is Resource.Error) {
-            _state.update { it.copy(errorMessage = passwordValidation.message) }
+            _state.update { it.copy(serverErrorMessage = passwordValidation.message) }
             return
         }
 
         val matchValidation = validatePasswordsMatchUseCase(password, confirmPassword)
         if (matchValidation is Resource.Error) {
-            _state.update { it.copy(errorMessage = matchValidation.message) }
+            _state.update { it.copy(serverErrorMessage = matchValidation.message) }
             return
         }
         // --- End Validations ---
 
         // If validations passed, clear error and proceed
-        _state.update { it.copy(isLoading = true, errorMessage = null) }
+        _state.update { it.copy(isLoading = true, serverErrorMessage = null) }
 
         viewModelScope.launch {
             registerUserUseCase(email, password).collect { resource ->
@@ -113,7 +135,7 @@ class RegisterViewModel @Inject constructor(
                             it.copy(
                                 isLoading = false,
                                 isRegisterSuccess = true,
-                                errorMessage = null
+                                serverErrorMessage = null
                             )
                         }
                         _event.tryEmit(RegisterSideEffect.NavigateToMain)
@@ -123,7 +145,7 @@ class RegisterViewModel @Inject constructor(
                         _state.update {
                             it.copy(
                                 isLoading = false,
-                                errorMessage = resource.message
+                                serverErrorMessage = resource.message
                             )
                         }
                         // Optionally emit event

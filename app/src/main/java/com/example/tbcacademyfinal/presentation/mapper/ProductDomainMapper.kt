@@ -5,7 +5,7 @@ import com.example.tbcacademyfinal.presentation.model.ProductUi
 
 fun Product.toUiModel(): ProductUi {
     // Example price formatting
-    val formattedPrice = "$price $"
+    val formattedPrice = "$$price"
 
     return ProductUi(
         id = id,

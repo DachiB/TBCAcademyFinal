@@ -166,6 +166,7 @@ fun LoginScreenContent(
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     isError = state.errorMessage != null,
+                    enabled = !state.isLoading
                 )
             }
 
@@ -212,7 +213,8 @@ fun LoginScreenContent(
                             )
                         }
                     },
-                    isError = state.errorMessage != null
+                    isError = state.errorMessage != null,
+                    enabled = !state.isLoading
                 )
             }
 
@@ -268,6 +270,7 @@ fun LoginScreenContent(
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
+                Spacer(modifier = Modifier.height(24.dp)) // Maintain space
             } else {
                 Spacer(modifier = Modifier.height(24.dp)) // Maintain space
             }

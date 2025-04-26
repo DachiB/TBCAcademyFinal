@@ -1,13 +1,17 @@
 package com.example.tbcacademyfinal.di
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
 import com.example.tbcacademyfinal.data.local.dao.CollectionDao
 import com.example.tbcacademyfinal.data.remote.ProductApiService
 import com.example.tbcacademyfinal.data.repository.AuthRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.CollectionRepositoryImpl
+import com.example.tbcacademyfinal.data.repository.DataStoreRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.ProductRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.UserRepositoryImpl
 import com.example.tbcacademyfinal.domain.repository.AuthRepository
 import com.example.tbcacademyfinal.domain.repository.CollectionRepository
+import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
 import com.example.tbcacademyfinal.domain.repository.ProductRepository
 import com.example.tbcacademyfinal.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
@@ -48,4 +52,11 @@ object RepositoryModule {
     fun provideCollectionRepository(collectionDao: CollectionDao): CollectionRepository {
         return CollectionRepositoryImpl(collectionDao)
     }
+
+    @Singleton
+    @Provides
+    fun provideDataStoreRepository(dataStore: DataStore<Preferences>): DataStoreRepository {
+        return DataStoreRepositoryImpl(dataStore)
+    }
+
 }
