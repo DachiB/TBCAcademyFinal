@@ -1,7 +1,7 @@
 package com.example.tbcacademyfinal.domain.repository
 
 import com.example.tbcacademyfinal.domain.model.Product
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface ProductRepository {

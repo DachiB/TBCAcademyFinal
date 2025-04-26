@@ -32,4 +32,12 @@
     <string name="details_added_to_collection">დაამატე კოლექციაში</string>
     <string name="details_add_to_collection">დამატებულია კოლექციაში</string>
     <string name="collection_clear_all">გაწმენდვა</string>
+    <string name="search_furniture">მოძებნე ავეჯი</string>
+    <string name="search_string">მოძებნა</string>
+    <string name="collection_start_decorating">დეკორაციის დაწყება</string>
+    <string name="collection_empty_message">კოლექცია ცარიელია</string>
+    <string name="collection_remove_item">წაშლა</string>
+    <string name="point_your_phone_down">დახარე შენი ტელეფონი ძირს, და ამოძრავე ნელა</string>
+    <string name="tap_anywhere_to_add_model">დაამატე შენი სასურველი მოდელი ეკრანზე დაჭერით</string>
+    <string name="login_remember_me">დამახსოვრება</string>
 </resources>

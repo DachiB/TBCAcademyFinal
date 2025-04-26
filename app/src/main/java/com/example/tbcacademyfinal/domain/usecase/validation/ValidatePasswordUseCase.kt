@@ -1,6 +1,6 @@
 package com.example.tbcacademyfinal.domain.usecase.validation
 
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import javax.inject.Inject
 
 class ValidatePasswordUseCase @Inject constructor() {

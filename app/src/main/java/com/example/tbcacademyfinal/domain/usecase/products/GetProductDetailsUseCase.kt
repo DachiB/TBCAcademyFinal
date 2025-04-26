@@ -2,7 +2,7 @@ package com.example.tbcacademyfinal.domain.usecase.products
 
 import com.example.tbcacademyfinal.domain.model.Product
 import com.example.tbcacademyfinal.domain.repository.ProductRepository
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

@@ -45,8 +45,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.presentation.model.CollectionItemUi
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
-import com.example.tbcacademyfinal.util.CollectSideEffect
-import com.example.tbcacademyfinal.util.ImageLoader
+import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.common.ImageLoader
 
 @Composable
 fun CollectionScreen(

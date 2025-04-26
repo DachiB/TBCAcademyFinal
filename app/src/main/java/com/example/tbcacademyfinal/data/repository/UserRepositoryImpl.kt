@@ -2,7 +2,7 @@ package com.example.tbcacademyfinal.data.repository
 
 import com.example.tbcacademyfinal.domain.model.User
 import com.example.tbcacademyfinal.domain.repository.UserRepository
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

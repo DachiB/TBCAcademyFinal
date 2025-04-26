@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.util
+package com.example.tbcacademyfinal.common
 
 sealed class Resource<out T> {
     data object Loading : Resource<Nothing>()

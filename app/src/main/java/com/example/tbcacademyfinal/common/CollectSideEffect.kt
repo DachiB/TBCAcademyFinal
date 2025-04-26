@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.util
+package com.example.tbcacademyfinal.common
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

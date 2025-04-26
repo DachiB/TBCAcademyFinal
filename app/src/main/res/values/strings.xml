@@ -33,10 +33,20 @@
     <string name="details_added_to_collection">Added To Collection</string>
     <string name="details_add_to_collection">Add To Collection</string>
     <string name="collection_clear_all">Clear All</string>
+    <string name="search_furniture">Search Furniture</string>
+    <string name="search_string">Search</string>
     <string name="collection_start_decorating">Start Decorating</string>
     <string name="collection_empty_message">List is empty</string>
     <string name="collection_remove_item">Remove Item</string>
     <string name="point_your_phone_down">Point your phone down at an empty space, and move it around slowly</string>
     <string name="tap_anywhere_to_add_model">Tap anywhere to add model\n</string>
     <string name="login_remember_me">Remember Me</string>
+    <string name="retry_button">Retry</string>
+    <string name="store_empty_title">Store is empty</string>
+    <string name="store_empty_message">nothing loaded</string>
+    <string name="store_no_results_message">search again</string>
+    <string name="store_no_results_title">No Results</string>
+    <string name="error_generic_title">Error</string>
+    <string name="error_no_internet_title">No Internet</string>
+    <string name="error_no_internet_message">No Internet Connection</string>
 </resources>

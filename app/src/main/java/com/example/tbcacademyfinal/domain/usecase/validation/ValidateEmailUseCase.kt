@@ -1,7 +1,7 @@
 package com.example.tbcacademyfinal.domain.usecase.validation
 
 import android.util.Patterns
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import javax.inject.Inject
 
 class ValidateEmailUseCase @Inject constructor() {

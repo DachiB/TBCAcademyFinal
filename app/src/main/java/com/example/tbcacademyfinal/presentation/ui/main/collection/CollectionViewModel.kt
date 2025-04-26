@@ -6,7 +6,7 @@ import com.example.tbcacademyfinal.domain.usecase.collection.ClearCollectionUseC
 import com.example.tbcacademyfinal.domain.usecase.collection.GetCollectionItemsUseCase
 import com.example.tbcacademyfinal.domain.usecase.collection.RemoveFromCollectionUseCase
 import com.example.tbcacademyfinal.presentation.mapper.toUiModelList
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow

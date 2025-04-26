@@ -3,7 +3,7 @@ package com.example.tbcacademyfinal.domain.usecase.auth
 import com.example.tbcacademyfinal.domain.model.User
 import com.example.tbcacademyfinal.domain.repository.AuthRepository
 import com.example.tbcacademyfinal.domain.usecase.user.CreateUserProfileUseCase
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import com.google.firebase.auth.AuthResult
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow

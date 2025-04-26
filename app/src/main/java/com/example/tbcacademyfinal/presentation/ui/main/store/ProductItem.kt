@@ -17,7 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.tbcacademyfinal.presentation.model.ProductUi
-import com.example.tbcacademyfinal.util.ImageLoader
+import com.example.tbcacademyfinal.common.ImageLoader
 
 @Composable
 fun ProductItem(
@@ -31,7 +31,7 @@ fun ProductItem(
         shape = MaterialTheme.shapes.medium
     ) {
         Column {
-            ImageLoader.LoadImage(
+            ImageLoader.AltLoadImage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f),

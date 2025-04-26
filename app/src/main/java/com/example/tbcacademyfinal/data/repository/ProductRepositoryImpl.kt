@@ -5,7 +5,7 @@ import com.example.tbcacademyfinal.data.mapper.toDomainList
 import com.example.tbcacademyfinal.data.remote.ProductApiService
 import com.example.tbcacademyfinal.domain.model.Product
 import com.example.tbcacademyfinal.domain.repository.ProductRepository
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow

@@ -1,7 +1,7 @@
 package com.example.tbcacademyfinal.data.repository
 
 import com.example.tbcacademyfinal.domain.repository.AuthRepository
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException

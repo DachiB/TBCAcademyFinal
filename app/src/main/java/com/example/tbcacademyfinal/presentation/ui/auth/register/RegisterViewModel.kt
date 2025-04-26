@@ -6,7 +6,7 @@ import com.example.tbcacademyfinal.domain.usecase.auth.RegisterUserUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidateEmailUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordsMatchUseCase
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow

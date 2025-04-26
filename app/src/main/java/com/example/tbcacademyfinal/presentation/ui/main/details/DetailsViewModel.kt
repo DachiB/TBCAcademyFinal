@@ -9,11 +9,9 @@ import com.example.tbcacademyfinal.domain.usecase.collection.AddToCollectionUseC
 import com.example.tbcacademyfinal.domain.usecase.collection.IsItemInCollectionUseCase
 import com.example.tbcacademyfinal.domain.usecase.products.GetProductDetailsUseCase
 import com.example.tbcacademyfinal.presentation.mapper.toUiModel
-import com.example.tbcacademyfinal.presentation.model.ProductUi
 import com.example.tbcacademyfinal.presentation.navigation.Routes
-import com.example.tbcacademyfinal.util.Resource
+import com.example.tbcacademyfinal.common.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
