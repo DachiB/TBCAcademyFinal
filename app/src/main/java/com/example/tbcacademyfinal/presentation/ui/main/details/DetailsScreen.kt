@@ -151,7 +151,7 @@ fun ProductDetails(
             imageUrl = product.imageUrl,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1.2f) // Adjust aspect ratio for details view
+                .aspectRatio(1f) // Adjust aspect ratio for details view
                 .padding(bottom = 16.dp)
                 .shadow(
                     elevation = 8.dp,
@@ -161,36 +161,13 @@ fun ProductDetails(
                 .clip(MaterialTheme.shapes.large),
             localContext = LocalContext.current
         )
-//        AsyncImage(
-//            model = ImageRequest.Builder(LocalContext.current)
-//                .data(product.imageUrl)
-//                .crossfade(true)
-//                .build(),
-//            contentDescription = product.name,
-//            placeholder = painterResource(R.drawable.ic_launcher_background),
-//            error = painterResource(R.drawable.ic_launcher_background),
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .aspectRatio(1.2f) // Adjust aspect ratio for details view
-//                .padding(bottom = 16.dp)
-//                .shadow(
-//                    elevation = 8.dp,
-//                    shape = RoundedCornerShape(12.dp),
-//                    clip = false // we’ll clip separately
-//                )
-//                .clip(MaterialTheme.shapes.large),
-//            contentScale = ContentScale.Crop,
-//            clipToBounds = true// Fit the whole image
-//        )
 
-        // Product Name
         Text(
             text = product.name,
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 8.dp)
         )
 
-        // Product Price
         Text(
             text = product.formattedPrice,
             style = MaterialTheme.typography.titleLarge,
@@ -198,15 +175,12 @@ fun ProductDetails(
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-        // Product Category (Optional)
         Text(
             text = "Category: ${product.category}", // TODO: Use string resource
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(bottom = 16.dp)
         )
 
-
-        // Product Description
         Text(
             text = product.description,
             style = MaterialTheme.typography.bodyLarge,
@@ -215,7 +189,6 @@ fun ProductDetails(
 
         Spacer(modifier = Modifier.weight(1f)) // Push button towards bottom
 
-        // Add to Collection Button
         Button(
             onClick = onAddToCollection,
             modifier = Modifier
@@ -239,22 +212,6 @@ fun ProductDetails(
     }
 }
 
-// --- Add String Resources ---
-// In res/values/strings.xml
-/*
-<string name="details_title">Product Details</string>
-<string name="details_add_to_collection">Add to Collection</string>
-<string name="details_added_to_collection">Added to Collection</string>
-*/
-// In res/values-ka/strings.xml
-/*
-<string name="details_title">პროდუქტის დეტალები</string>
-<string name="details_add_to_collection">კოლექციაში დამატება</string>
-<string name="details_added_to_collection">კოლექციაში დამატებულია</string>
-*/
-
-
-// --- Previews ---
 @Preview(showBackground = true, name = "Details Screen Content")
 @Composable
 fun DetailsScreenContentPreview() {

@@ -35,9 +35,16 @@ class SplashViewModel @Inject constructor(
             // Read the DataStore value for landing page status
             val hasSeenLanding = dataStoreRepository.hasSeenLanding().first()
 
+            val shouldRememberUser = dataStoreRepository.shouldRememberUser().first()
+
             val sideEffect: SplashSideEffect = when {
-                isLoggedIn -> SplashSideEffect.NavigateToMain
+                // If logged in AND remembered -> Go straight to Main
+                isLoggedIn && shouldRememberUser -> SplashSideEffect.NavigateToMain
+                // If logged in BUT NOT remembered (e.g., previous session expired, user logged out) -> Go to Auth
+                isLoggedIn && !shouldRememberUser -> SplashSideEffect.NavigateToAuth
+                // If not logged in, but saw landing -> Go to Auth
                 hasSeenLanding -> SplashSideEffect.NavigateToAuth
+                // First time ever -> Go to Landing
                 else -> SplashSideEffect.NavigateToLanding
             }
             _uiEvent.emit(sideEffect)

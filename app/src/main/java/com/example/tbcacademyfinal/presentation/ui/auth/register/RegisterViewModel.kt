@@ -43,21 +43,27 @@ class RegisterViewModel @Inject constructor(
             is RegisterIntent.ConfirmPasswordChanged -> updateConfirmPassword(intent.confirmPassword)
             is RegisterIntent.RegisterClicked -> performRegistration()
             is RegisterIntent.NavigateBackClicked -> navigateBack()
-            is RegisterIntent.ConfirmPasswordVisibilityChanged -> updatePasswordVisibility()
-            is RegisterIntent.PasswordVisibilityChanged -> updateConfirmPasswordVisibility()
+            is RegisterIntent.ConfirmPasswordVisibilityChanged -> updateConfirmPasswordVisibility()
+            is RegisterIntent.PasswordVisibilityChanged -> updatePasswordVisibility()
         }
     }
 
     private fun updateEmail(email: String) {
-        _state.update { it.copy(email = email, errorMessage = null) }
+        val emailValidation = validateEmailUseCase(email)
+        val errorMessage = if (emailValidation is Resource.Error) emailValidation.message else null
+        _state.update { it.copy(email = email, errorMessage = errorMessage) }
     }
 
     private fun updatePassword(password: String) {
-        _state.update { it.copy(password = password, errorMessage = null) }
+        val passwordValidation = validatePasswordUseCase(password)
+        val errorMessage = if (passwordValidation is Resource.Error) passwordValidation.message else null
+        _state.update { it.copy(password = password, errorMessage = errorMessage) }
     }
 
     private fun updateConfirmPassword(confirmPassword: String) {
-        _state.update { it.copy(confirmPassword = confirmPassword, errorMessage = null) }
+        val matchValidation = validatePasswordsMatchUseCase(state.value.password, confirmPassword)
+        val errorMessage = if (matchValidation is Resource.Error) matchValidation.message else null
+        _state.update { it.copy(confirmPassword = confirmPassword, errorMessage = errorMessage) }
     }
 
     private fun updatePasswordVisibility() {

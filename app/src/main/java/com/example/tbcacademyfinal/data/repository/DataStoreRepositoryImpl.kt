@@ -19,7 +19,7 @@ class DataStoreRepositoryImpl @Inject constructor(
     override suspend fun setHasSeenLanding(hasSeen: Boolean) {
         try {
             dataStore.edit { preferences ->
-                preferences[PreferencesKeys.HAS_SEEN_LANDING] = hasSeen
+                preferences[PreferencesKeys.SEEN_LANDING] = hasSeen
             }
         } catch (e: IOException) {
             // Handle error, e.g., log it
@@ -40,7 +40,20 @@ class DataStoreRepositoryImpl @Inject constructor(
             }
             .map { preferences ->
                 // Default to false if the key doesn't exist
-                preferences[PreferencesKeys.HAS_SEEN_LANDING] ?: false
+                preferences[PreferencesKeys.SEEN_LANDING] ?: false
             }
+    }
+
+    override suspend fun setShouldRememberUser(remember: Boolean) {
+        try {
+            dataStore.edit { prefs -> prefs[PreferencesKeys.SHOULD_REMEMBER_USER] = remember }
+        } catch (e: IOException) { /* Handle error */
+        }
+    }
+
+    override fun shouldRememberUser(): Flow<Boolean> {
+        return dataStore.data.catch { /* Handle error */ }.map { prefs ->
+            prefs[PreferencesKeys.SHOULD_REMEMBER_USER] ?: false // Default to false
+        }
     }
 }

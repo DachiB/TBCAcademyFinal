@@ -2,6 +2,7 @@ package com.example.tbcacademyfinal.presentation.ui.main.store
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tbcacademyfinal.domain.model.Product
 import com.example.tbcacademyfinal.domain.usecase.products.GetProductsUseCase
 import com.example.tbcacademyfinal.presentation.mapper.toUiModelList
 import com.example.tbcacademyfinal.util.Resource
@@ -16,60 +17,80 @@ class StoreViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(StoreState())
-    val state: StateFlow<StoreState> = _state.asStateFlow() // Expose as StateFlow
+    // Hold the raw domain products fetched from the repository
+    private val _rawProductsFlow = MutableStateFlow<Resource<List<Product>>>(Resource.Loading)
+
+    // Hold the search query separately
+    private val _searchQuery = MutableStateFlow("")
+    val searchQuery: StateFlow<String> = _searchQuery.asStateFlow()
+
+    // Combine raw products and search query to produce the final UI state
+    val state: StateFlow<StoreState> = combine(
+        _rawProductsFlow,
+        _searchQuery
+    ) { productResource, query ->
+        when (productResource) {
+            is Resource.Loading -> StoreState(isLoading = true)
+            is Resource.Error -> StoreState(isLoading = false, error = productResource.message)
+            is Resource.Success -> {
+                val allProducts = productResource.data
+                val filteredProducts = if (query.isBlank()) {
+                    allProducts // No filter if query is blank
+                } else {
+                    allProducts.filter {
+                        // Simple filter: check name or description (case-insensitive)
+                        it.name.contains(query, ignoreCase = true) ||
+                                it.description.contains(query, ignoreCase = true)
+                        // Add category filter later if needed
+                    }
+                }
+                StoreState(
+                    isLoading = false,
+                    products = filteredProducts.toUiModelList(), // Map *filtered* list to UI models
+                    searchQuery = query // Reflect current query in state
+                )
+            }
+        }
+    }.stateIn( // Convert the combined Flow into a StateFlow
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000), // Keep active while UI is visible
+        initialValue = StoreState(isLoading = true) // Initial state while fetching
+    )
+
 
     private val _event = MutableSharedFlow<StoreSideEffect>(
-        replay = 0, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST
+        replay = 0,
+        extraBufferCapacity = 1,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
     )
-    val event: SharedFlow<StoreSideEffect> = _event.asSharedFlow() // Expose as SharedFlow
+    val event: SharedFlow<StoreSideEffect> = _event.asSharedFlow()
 
     init {
-        // Automatically load products when ViewModel is created
-        processIntent(StoreIntent.LoadProducts)
+        fetchProducts() // Trigger initial fetch
     }
 
     fun processIntent(intent: StoreIntent) {
         when (intent) {
-            is StoreIntent.LoadProducts -> fetchProducts()
+            is StoreIntent.LoadProducts -> fetchProducts() // Allow explicit refresh
             is StoreIntent.ProductClicked -> navigateToDetails(intent.productId)
+            is StoreIntent.SearchQueryChanged -> _searchQuery.value =
+                intent.query // Update search query flow
         }
     }
 
+    // Fetches from repository and updates the private _rawProductsFlow
     private fun fetchProducts() {
-        // Prevent reloading if already loading
-        if (_state.value.isLoading && _state.value.products.isNotEmpty()) return // Avoid reload if loading for the first time already
+        // Prevent refetch if already loading/success unless forced refresh
+        // if (_rawProductsFlow.value !is Resource.Loading && intent is not forced) return
 
         viewModelScope.launch {
             getProductsUseCase().collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> {
-                        _state.update { it.copy(isLoading = true, error = null) }
-                    }
-
-                    is Resource.Success -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                // Map domain models to UI models here
-                                products = resource.data.toUiModelList(),
-                                error = null
-                            )
-                        }
-                    }
-
-                    is Resource.Error -> {
-                        _state.update { it.copy(isLoading = false, error = resource.message) }
-                        // Optionally emit a snackbar event
-                        // _event.tryEmit(StoreSideEffect.ShowErrorSnackbar(resource.message))
-                    }
-                }
+                _rawProductsFlow.value = resource // Update the raw data flow
             }
         }
     }
 
     private fun navigateToDetails(productId: String) {
-        // Emit side effect for navigation
         _event.tryEmit(StoreSideEffect.NavigateToDetails(productId))
     }
 }

@@ -1,5 +1,6 @@
 package com.example.tbcacademyfinal.di
 
+import com.example.tbcacademyfinal.BuildConfig
 import com.example.tbcacademyfinal.data.remote.ProductApiService
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -49,7 +50,7 @@ object NetworkModule {
     fun provideRetrofit(okHttpClient: OkHttpClient, moshi: Moshi): Retrofit {
         return Retrofit
             .Builder()
-            .baseUrl("https://run.mocky.io/v3/")
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .addConverterFactory(MoshiConverterFactory.create(moshi))
             .build()

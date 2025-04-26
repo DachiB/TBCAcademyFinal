@@ -7,6 +7,7 @@ import com.example.tbcacademyfinal.presentation.model.ProductUi
 data class StoreState(
     val isLoading: Boolean = true,
     val products: List<ProductUi> = emptyList(),
-    val error: String? = null
+    val error: String? = null,
+    val searchQuery: String = ""
     // Add other state like filters, search query etc. later
 )

@@ -8,10 +8,10 @@ import retrofit2.http.Path
 interface ProductApiService {
 
     // Example endpoint for getting all products
-    @GET("api/products") // Adjust path based on your mock API or real endpoint
+    @GET("products") // Adjust path based on your mock API or real endpoint
     suspend fun getProducts(): Response<List<ProductDto>> // Return list of DTOs
 
     // Example endpoint for getting a single product by ID
-    @GET("api/products/{productId}")
+    @GET("products/{productId}")
     suspend fun getProductById(@Path("productId") id: String): Response<ProductDto>
 }

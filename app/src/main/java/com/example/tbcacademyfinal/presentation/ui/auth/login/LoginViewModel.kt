@@ -2,6 +2,7 @@ package com.example.tbcacademyfinal.presentation.ui.auth.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
 import com.example.tbcacademyfinal.domain.usecase.auth.LoginUserUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidateEmailUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordUseCase
@@ -20,7 +21,8 @@ import javax.inject.Inject
 class LoginViewModel @Inject constructor(
     private val loginUserUseCase: LoginUserUseCase,
     private val validateEmailUseCase: ValidateEmailUseCase,
-    private val validatePasswordUseCase: ValidatePasswordUseCase
+    private val validatePasswordUseCase: ValidatePasswordUseCase,
+    private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
     private var _state = MutableStateFlow(LoginState())
@@ -41,6 +43,7 @@ class LoginViewModel @Inject constructor(
             is LoginIntent.LoginClicked -> performLogin()
             is LoginIntent.RegisterLinkClicked -> navigateToRegister()
             is LoginIntent.PasswordVisibilityChanged -> updatePasswordVisibility()
+            is LoginIntent.RememberMeChanged -> _state.update { it.copy(rememberMe = intent.isChecked) }
         }
     }
 
@@ -75,7 +78,7 @@ class LoginViewModel @Inject constructor(
             return // Stop if validation fails
         }
         // --- End Validations ---
-
+        val rememberUserPref = state.value.rememberMe
         // If validations passed, clear any previous error and proceed
         _state.update { it.copy(isLoading = true, errorMessage = null) }
 
@@ -84,6 +87,7 @@ class LoginViewModel @Inject constructor(
                 when (resource) {
                     is Resource.Loading -> _state.update { it.copy(isLoading = true) } // Can keep updating loading just in case
                     is Resource.Success -> {
+                        dataStoreRepository.setShouldRememberUser(rememberUserPref)
                         _state.update {
                             it.copy(
                                 isLoading = false,

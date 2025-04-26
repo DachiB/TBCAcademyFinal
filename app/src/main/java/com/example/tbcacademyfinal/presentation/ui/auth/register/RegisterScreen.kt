@@ -80,8 +80,6 @@ fun RegisterScreenContent(
     state: RegisterState,
     processIntent: (RegisterIntent) -> Unit
 ) {
-    var passwordVisible by rememberSaveable { mutableStateOf(false) }
-    var confirmPasswordVisible by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -139,15 +137,15 @@ fun RegisterScreenContent(
                 label = { Text(stringResource(R.string.password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     val image =
-                        if (passwordVisible) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
-                    IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                        if (state.isPasswordVisible) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                    IconButton(onClick = { processIntent(RegisterIntent.PasswordVisibilityChanged) }) {
                         Icon(
                             imageVector = image,
-                            contentDescription = if (passwordVisible) stringResource(R.string.hide_password) else stringResource(
+                            contentDescription = if (state.isPasswordVisible) stringResource(R.string.hide_password) else stringResource(
                                 R.string.show_password
                             )
                         )
@@ -165,15 +163,17 @@ fun RegisterScreenContent(
                 label = { Text(stringResource(R.string.confirm_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (state.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
                     val image =
-                        if (passwordVisible) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
-                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                        if (state.isConfirmPasswordVisible) Icons.Filled.Favorite else Icons.Outlined.FavoriteBorder
+                    IconButton(onClick = { processIntent(RegisterIntent.ConfirmPasswordVisibilityChanged) }) {
                         Icon(
                             imageVector = image,
-                            contentDescription = if (confirmPasswordVisible) stringResource(R.string.hide_password) else stringResource(
+                            contentDescription = if (state.isConfirmPasswordVisible) stringResource(
+                                R.string.hide_password
+                            ) else stringResource(
                                 R.string.show_password
                             )
                         )

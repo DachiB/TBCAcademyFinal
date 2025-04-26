@@ -5,4 +5,7 @@ import kotlinx.coroutines.flow.Flow
 interface DataStoreRepository {
     suspend fun setHasSeenLanding(hasSeen: Boolean)
     fun hasSeenLanding(): Flow<Boolean>
+
+    suspend fun setShouldRememberUser(remember: Boolean)
+    fun shouldRememberUser(): Flow<Boolean>
 }
