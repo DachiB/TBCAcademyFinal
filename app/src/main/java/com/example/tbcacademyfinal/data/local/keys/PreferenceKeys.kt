@@ -6,6 +6,6 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 object PreferencesKeys {
     val SEEN_LANDING = booleanPreferencesKey("has_seen_landing")
     val SHOULD_REMEMBER_USER = booleanPreferencesKey("remember_user")
-    val APP_THEME = stringPreferencesKey("app_theme") // Store enum name as String
-    val APP_LANGUAGE = stringPreferencesKey("app_language") // Store enum name as String
+    val DARK_THEME_KEY = booleanPreferencesKey("dark_theme")
+    val LANGUAGE_KEY = stringPreferencesKey("language") // Store enum name as String
 }

@@ -39,50 +39,6 @@ fun ProductItem(
                 description = product.name,
                 localContext = LocalContext.current
             )
-//            SubcomposeAsyncImage(
-//                model = ImageRequest.Builder(LocalContext.current)
-//                    .data(product.imageUrl)
-//                    .crossfade(true)
-//                    .build(),
-//                loading = {
-//                    CircularProgressIndicator(
-//                        modifier = Modifier
-//                            .size(24.dp)
-//                            .padding(64.dp)
-//                            .align(Alignment.Center)
-//                    )
-//                },
-//                contentDescription = product.name,
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .aspectRatio(1f),
-//                contentScale = ContentScale.Crop,
-//                error = {
-//                    Image(
-//                        painter = painterResource(R.drawable.ic_launcher_background),
-//                        contentDescription = null,
-//                        modifier = Modifier
-//                            .fillMaxWidth()
-//                            .aspectRatio(1f)
-//                    )
-//                }
-//            )
-//            AsyncImage(
-//                model = ImageRequest.Builder(LocalContext.current)
-//                    .data(product.imageUrl)
-//                    .crossfade(true)
-//                    .build(),
-//                placeholder = painterResource(R.drawable.ic_launcher_background), // Add a placeholder drawable
-//                error = painterResource(R.drawable.ic_launcher_background), // Use same or error specific drawable
-//                contentDescription = product.name,
-//                onLoading = {
-//
-//                },
-//                modifier = Modifier
-//                    .fillMaxWidth()
-//                    .aspectRatio(1f),
-//                contentScale = ContentScale.Crop, // Crop image to fit aspect ratio
-//            )
             Column(
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 12.dp)
             ) {

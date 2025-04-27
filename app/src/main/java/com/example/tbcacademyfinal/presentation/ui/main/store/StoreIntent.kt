@@ -4,5 +4,5 @@ sealed interface StoreIntent {
     data object LoadProducts : StoreIntent
     data class ProductClicked(val productId: String) : StoreIntent
     data class SearchQueryChanged(val query: String) : StoreIntent
-    // Add intents for filter changes, search, etc. later
+    data object RetryButtonClicked : StoreIntent
 }

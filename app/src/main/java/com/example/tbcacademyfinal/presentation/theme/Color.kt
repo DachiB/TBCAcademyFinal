@@ -4,7 +4,6 @@ import androidx.compose.ui.graphics.Color
 
 // Suggested Palette
 val CreamWhite = Color(0xFFFAF7F0)
-val PlainWhite = Color(0xFFFFFFFF)
 val ForestGreen = Color(0xFF3A5A40)
 val WalnutBrown = Color(0xFF7C5C46)
 val GoldAccent = Color(0xFFDAA520)

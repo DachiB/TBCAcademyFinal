@@ -1,32 +1,37 @@
 package com.example.tbcacademyfinal.presentation.ui.main.store
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Warning
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.common.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.model.ProductUi
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
@@ -36,129 +41,158 @@ fun StoreScreen(
     viewModel: StoreViewModel = hiltViewModel(),
     onNavigateToDetails: (productId: String) -> Unit,
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-    val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
-
     // Handle side effects like navigation
+    val snackbarHostState = remember { SnackbarHostState() }
+
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
             is StoreSideEffect.NavigateToDetails -> onNavigateToDetails(effect.productId)
             is StoreSideEffect.ShowErrorSnackbar -> {
-                println("StoreScreen Error: ${effect.message}")
+                snackbarHostState.showSnackbar(
+                    message = effect.message,
+                    duration = SnackbarDuration.Short,
+                    actionLabel = "Dismiss",
+                    withDismissAction = true
+                )
             }
         }
     }
 
-    StoreScreenContent(
-        state = state,
-        searchQuery = searchQuery,
-        onProductClick = { productId ->
-            viewModel.processIntent(StoreIntent.ProductClicked(productId))
-        },
-        onSearchQueryChange = { query ->
-            viewModel.processIntent(StoreIntent.SearchQueryChanged(query))
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
         }
-    )
+    ) {
+        StoreScreenContent(
+            state = viewModel.state,
+            onIntent = viewModel::processIntent
+        )
+    }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun StoreScreenContent(
     state: StoreState,
-    searchQuery: String, // Receive current query
-    onProductClick: (productId: String) -> Unit,
-    onSearchQueryChange: (query: String) -> Unit // Receive lambda for query change
+    onIntent: (StoreIntent) -> Unit // Receive lambda for query change
 ) {
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-    ) {
-        // Search Bar
-        OutlinedTextField(
-            value = searchQuery,
-            onValueChange = onSearchQueryChange, // Call lambda on change
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            label = { Text("Search Furniture") }, // TODO: String resource
-            leadingIcon = {
-                Icon(
-                    Icons.Default.Search,
-                    contentDescription = "Search"
-                )
-            }, // TODO: String resource
-            singleLine = true,
-            colors = TextFieldDefaults.colors() // Use default M3 colors
-        )
-
-        // Content Area (Loading/Error/Grid)
-        Box(modifier = Modifier.fillMaxSize()) { // Change to fill remaining space
-            if (state.isLoading && state.products.isEmpty()) {
+    if (state.isNetworkAvailable) {
+        if (state.isLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+            ) {
                 LinearProgressIndicator(
                     modifier = Modifier
                         .width(72.dp)
                         .align(Alignment.Center),
-                    color = MaterialTheme.colorScheme.primary // Use primary color for indicator
+                    color = MaterialTheme.colorScheme.primary
                 )
-            } else if (state.error != null && state.products.isEmpty()) {
-                Text(text = "Error: ${state.error}")
-            } else if (!state.isLoading && state.products.isEmpty() && searchQuery.isNotEmpty()) {
-                // Show "No results" message when searching and empty
-                Text(
-                    text = "No results found for \"$searchQuery\"", // TODO: String resource
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp)
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(
+                        top = 8.dp,
+                        start = 16.dp,
+                        end = 16.dp
+                    ),
+            ) {
+                OutlinedTextField(
+                    value = state.searchQuery,
+                    modifier = Modifier.fillMaxWidth(),
+                    onValueChange = { query ->
+                        onIntent(StoreIntent.SearchQueryChanged(query))
+                    },
+                    label = {
+                        Text(
+                            stringResource(R.string.search_string)
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = R.string.search_string.toString()
+                        )
+
+                    }
                 )
-            } else if (!state.isLoading && state.products.isEmpty() && searchQuery.isBlank()) {
-                // Show "Empty store" only if not loading, not searching, and empty
-                Text(
-                    text = "Store is empty.", // TODO: String resource
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .padding(16.dp)
-                )
-            } else {
-                // Display Product Grid
-                LazyVerticalGrid(
-                    columns = GridCells.Adaptive(minSize = 160.dp), // Adjust minSize as needed
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = 8.dp,start = 16.dp, end = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    items(state.products, key = { product -> product.id }) { product ->
-                        ProductItem(
-                            product = product,
-                            onClick = { onProductClick(product.id) },
-                            modifier = Modifier.animateItemPlacement()
+                if (state.isSearching) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        LinearProgressIndicator(
+                            modifier = Modifier
+                                .width(72.dp)
+                                .align(Alignment.Center),
+                            color = MaterialTheme.colorScheme.primary
                         )
                     }
-
-                    // Optional: Add loading indicator at the bottom if loading more pages
-                    if (state.isLoading && state.products.isNotEmpty()) {
-                        item { // GridItemSpan Scope not needed for single item here
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                LinearProgressIndicator(
-                                    modifier = Modifier
-                                        .width(72.dp)
-                                        .align(Alignment.Center),
-                                    color = MaterialTheme.colorScheme.primary // Use primary color for indicator
-                                )
-                            }
+                } else if (state.products.isNotEmpty()) {
+                    ProductGrid(
+                        state = state,
+                        onProductClick = { productId ->
+                            onIntent(StoreIntent.ProductClicked(productId))
                         }
+                    )
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                    ) {
+                        Text(
+                            text = stringResource(R.string.no_such_product_s),
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.align(
+                                Alignment.Center
+                            )
+                        )
                     }
                 }
             }
+
+        }
+    } else {
+        Column(
+            modifier = Modifier
+                .fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.Warning,
+                contentDescription = "No internet connection",
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .size(48.dp),
+            )
+            Text(
+                text = "No internet connection",
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyLarge,
+                textAlign = TextAlign.Center
+            )
+            Button(
+                onClick = { onIntent(StoreIntent.RetryButtonClicked) },
+                modifier = Modifier
+                    .padding(top = 16.dp)
+                    .size(
+                        width = 150.dp,
+                        height = 40.dp
+                    )
+
+            ) {
+                Text(
+                    text = "Retry",
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
         }
     }
+
 }
 
 
@@ -189,10 +223,12 @@ fun StoreScreenContentPreview() {
             ProductUi("p3", "Oak Coffee Table", "Desc", "$399.00", "", "Tables", "m3")
         )
         StoreScreenContent(
-            state = StoreState(isLoading = false, products = sampleProducts),
-            onProductClick = {},
-            searchQuery = "",
-            onSearchQueryChange = {}
+            state = StoreState(
+                isLoading = false,
+                products = sampleProducts,
+                isNetworkAvailable = true
+            ),
+            onIntent = {}
         )
     }
 }

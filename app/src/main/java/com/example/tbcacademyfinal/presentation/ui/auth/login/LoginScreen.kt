@@ -134,6 +134,7 @@ fun LoginScreenContent(
             ) {
                 Text(
                     text = stringResource(R.string.login_title),
+                    color = MaterialTheme.colorScheme.onBackground,
                     style = MaterialTheme.typography.headlineMedium,
                     modifier = Modifier.padding(bottom = 32.dp)
                 )

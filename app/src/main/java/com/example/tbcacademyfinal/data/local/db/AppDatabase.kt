@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.data.local
+package com.example.tbcacademyfinal.data.local.db
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

@@ -1,7 +1,10 @@
 package com.example.tbcacademyfinal.presentation.ui.main.profile
 
 import android.util.Log
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -26,13 +30,17 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tbcacademyfinal.R
-import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
+import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.LanguageToggleButton
+import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.SettingsViewModel
+import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.ThemeSwitcher
 
 
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
+    settingViewModel: SettingsViewModel = hiltViewModel(),
     onLogout: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -43,10 +51,11 @@ fun ProfileScreen(
         }
     }
 
-    // Call the simplified content composable
+
     ProfileScreenContent(
         state = state,
-        processIntent = viewModel::processIntent
+        processIntent = viewModel::processIntent,
+        settingsViewModel = settingViewModel
     )
 }
 
@@ -54,19 +63,37 @@ fun ProfileScreen(
 @Composable
 fun ProfileScreenContent(
     state: ProfileState,
+    settingsViewModel: SettingsViewModel,
     processIntent: (ProfileIntent) -> Unit
 ) {
+    val isDarkTheme by settingsViewModel.darkThemeFlow.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(R.string.profile_title), // Keep title
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 24.dp)
-        )
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(R.string.profile_title), // Keep title
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier
+                    .padding(bottom = 24.dp)
+                    .align(Alignment.CenterVertically),
+                textAlign = TextAlign.Start
+            )
+            ThemeSwitcher(
+                size = 50.dp,
+                padding = 4.dp,
+                darkTheme = isDarkTheme,
+                onClick = { settingsViewModel.toggleTheme(isDarkTheme) }
+            )
+
+        }
+        LanguageToggleButton(settingsViewModel)
 
         if (state.isLoading) {
             CircularProgressIndicator()
@@ -84,7 +111,7 @@ fun ProfileScreenContent(
             // Display User Email (Main Content)
             Text(
                 // Use the updated string resource if desired, or just display email
-                text = state.userEmail ?: stringResource(R.string.profile_email_placeholder),
+                text = "Email: ${state.userEmail}",
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
@@ -121,7 +148,8 @@ fun ProfileScreenPreviewLight() {
                 userEmail = "test@example.com",
                 isLoading = false
             ), // Simplified state
-            processIntent = {}
+            processIntent = {},
+            settingsViewModel = hiltViewModel()
         )
     }
 }
@@ -132,7 +160,8 @@ fun ProfileScreenPreviewLoading() {
     TBCAcademyFinalTheme {
         ProfileScreenContent(
             state = ProfileState(isLoading = true), // Simplified state
-            processIntent = {}
+            processIntent = {},
+            settingsViewModel = hiltViewModel()
         )
     }
 }
@@ -146,7 +175,8 @@ fun ProfileScreenPreviewError() {
                 isLoading = false,
                 error = "Failed to load profile"
             ), // Simplified state
-            processIntent = {}
+            processIntent = {},
+            settingsViewModel = hiltViewModel()
         )
     }
 }

@@ -62,6 +62,8 @@ class ConnectivityObserverImpl @Inject constructor(
                 }
             }
 
+            launch { send(getCurrentStatus()) }
+
             connectivityManager.registerDefaultNetworkCallback(callback)
             awaitClose {
                 connectivityManager.unregisterNetworkCallback(callback)

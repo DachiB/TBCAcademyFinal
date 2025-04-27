@@ -8,7 +8,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun <T> CollectSideEffect(flow: Flow<T>, sideEffect: suspend (T) -> Unit) {
+fun <T> CollectSideEffect(flow: Flow<T>,  sideEffect:  suspend (T) -> Unit) {
     val lifecycle = LocalLifecycleOwner.current
 
     LaunchedEffect(Unit) {

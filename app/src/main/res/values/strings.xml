@@ -50,4 +50,6 @@
     <string name="error_no_internet_title">No Internet</string>
     <string name="error_no_internet_message">No Internet Connection</string>
     <string name="offline_mode">Offline</string>
+    <string name="no_such_product_s">No such product(s)</string>
+    <string name="buy_collection">Buy Collection</string>
 </resources>

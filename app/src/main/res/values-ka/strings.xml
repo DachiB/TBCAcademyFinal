@@ -40,4 +40,15 @@
     <string name="point_your_phone_down">დახარე შენი ტელეფონი ძირს, და ამოძრავე ნელა</string>
     <string name="tap_anywhere_to_add_model">დაამატე შენი სასურველი მოდელი ეკრანზე დაჭერით</string>
     <string name="login_remember_me">დამახსოვრება</string>
+    <string name="retry_button">ცადე თავიდან</string>
+    <string name="store_empty_title">ცარიელია</string>
+    <string name="store_empty_message">ცარიელია</string>
+    <string name="store_no_results_message">მოძებნე თავიდან</string>
+    <string name="store_no_results_title">არ არის შედეგი</string>
+    <string name="error_generic_title">შეცდომა</string>
+    <string name="error_no_internet_title">არარის ინტერნეტი</string>
+    <string name="error_no_internet_message">არარის ინტერნეტზე წვდომა</string>
+    <string name="offline_mode">ოფლაინი</string>
+    <string name="no_such_product_s">ვერმოიძებნა მსგავსი პროდუქტი</string>
+    <string name="buy_collection">იყიდე კოლექცია</string>
 </resources>

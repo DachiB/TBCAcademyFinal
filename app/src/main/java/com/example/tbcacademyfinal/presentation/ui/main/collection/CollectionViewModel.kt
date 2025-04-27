@@ -1,5 +1,8 @@
 package com.example.tbcacademyfinal.presentation.ui.main.collection
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.domain.usecase.collection.ClearCollectionUseCase
@@ -8,7 +11,6 @@ import com.example.tbcacademyfinal.domain.usecase.collection.RemoveFromCollectio
 import com.example.tbcacademyfinal.presentation.mapper.toUiModelList
 import com.example.tbcacademyfinal.common.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -28,14 +30,10 @@ class CollectionViewModel @Inject constructor(
     private val clearCollectionUseCase: ClearCollectionUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(CollectionState())
-    val state: StateFlow<CollectionState> = _state.asStateFlow()
+    var state by mutableStateOf(CollectionState())
+        private set
 
-    private val _event = MutableSharedFlow<CollectionSideEffect>(
-        replay = 0,
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val _event = MutableSharedFlow<CollectionSideEffect>()
     val event: SharedFlow<CollectionSideEffect> = _event.asSharedFlow()
 
     init {
@@ -48,29 +46,25 @@ class CollectionViewModel @Inject constructor(
             is CollectionIntent.RemoveItem -> removeItem(intent.productId)
             is CollectionIntent.ClearCollection -> clearAllItems()
             is CollectionIntent.StartDecorating -> startAr()
+            is CollectionIntent.BuyCollection -> TODO()
         }
     }
 
     private fun loadCollectionItems() {
         viewModelScope.launch {
             getCollectionItemsUseCase()
-                .onStart { _state.update { it.copy(isLoading = true, error = null) } }
+                .onStart {
+                    state = state.copy(isLoading = true, error = null)
+                }
                 .catch { e ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            error = e.localizedMessage ?: "Failed to load collection"
-                        )
-                    }
+                    state = state.copy(isLoading = false, error = e.message)
                 }
                 .collect { domainItems ->
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            items = domainItems.toUiModelList(),
-                            error = null
-                        )
-                    }
+                    state = state.copy(
+                        isLoading = false,
+                        error = null,
+                        items = domainItems.toUiModelList()
+                    )
                 }
         }
     }
@@ -80,7 +74,9 @@ class CollectionViewModel @Inject constructor(
             val result = removeFromCollectionUseCase(productId)
             // State list will update automatically via the flow from getCollectionItemsUseCase
             if (result is Resource.Error) {
-                _event.tryEmit(CollectionSideEffect.ShowError(result.message))
+                viewModelScope.launch {
+                    _event.emit(CollectionSideEffect.ShowError(result.message))
+                }
             }
         }
     }
@@ -90,12 +86,16 @@ class CollectionViewModel @Inject constructor(
             val result = clearCollectionUseCase()
             // State list will update automatically via the flow
             if (result is Resource.Error) {
-                _event.tryEmit(CollectionSideEffect.ShowError(result.message))
+                viewModelScope.launch {
+                    _event.emit(CollectionSideEffect.ShowError(result.message))
+                }
             }
         }
     }
 
     private fun startAr() {
-        _event.tryEmit(CollectionSideEffect.NavigateToArScreen)
+        viewModelScope.launch {
+            _event.emit(CollectionSideEffect.NavigateToArScreen)
+        }
     }
 }

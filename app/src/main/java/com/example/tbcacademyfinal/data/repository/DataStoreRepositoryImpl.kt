@@ -5,6 +5,8 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import com.example.tbcacademyfinal.data.local.keys.PreferencesKeys
+import com.example.tbcacademyfinal.data.local.keys.PreferencesKeys.DARK_THEME_KEY
+import com.example.tbcacademyfinal.data.local.keys.PreferencesKeys.LANGUAGE_KEY
 import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -56,4 +58,28 @@ class DataStoreRepositoryImpl @Inject constructor(
             prefs[PreferencesKeys.SHOULD_REMEMBER_USER] ?: false // Default to false
         }
     }
+
+    override fun darkThemeFlow(): Flow<Boolean> =
+        dataStore.data
+            .map { prefs -> prefs[DARK_THEME_KEY] ?: false }
+
+    override suspend fun setDarkTheme(isDark: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[DARK_THEME_KEY] = isDark
+        }
+    }
+
+    override suspend fun updateLanguage(language: String) {
+        dataStore.edit { preferences ->
+            preferences[LANGUAGE_KEY] = language
+        }
+    }
+
+    override fun getAppLanguage(): Flow<String> {
+        return dataStore.data
+        .map { preferences ->
+            preferences[LANGUAGE_KEY] ?: "en"
+        }
+    }
+
 }

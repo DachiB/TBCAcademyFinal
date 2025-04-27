@@ -20,8 +20,6 @@ abstract class ObserverModule { // Use abstract class or object for @Provides
         connectivityObserverImpl: ConnectivityObserverImpl
     ): ConnectivityObserver
 
-    // --- OR ---
-
     // If ConnectivityObserverImpl constructor isn't @Inject or you prefer @Provides:
     // (Your original approach was also fine, just slightly less idiomatic than @Binds here)
     // @Provides

@@ -111,6 +111,7 @@ fun RegisterScreenContent(
             Text(
                 text = stringResource(R.string.register_title),
                 style = MaterialTheme.typography.headlineMedium,
+                color = MaterialTheme.colorScheme.onBackground,
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
@@ -135,7 +136,6 @@ fun RegisterScreenContent(
                 }
             )
             Spacer(modifier = Modifier.height(16.dp))
-
             // Password Field - Dispatch Intent
             OutlinedTextField(
                 value = state.password,

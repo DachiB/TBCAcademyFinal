@@ -2,7 +2,7 @@ package com.example.tbcacademyfinal.di
 
 import android.content.Context
 import androidx.room.Room
-import com.example.tbcacademyfinal.data.local.AppDatabase
+import com.example.tbcacademyfinal.data.local.db.AppDatabase
 import com.example.tbcacademyfinal.data.local.dao.CollectionDao
 import dagger.Module
 import dagger.Provides
