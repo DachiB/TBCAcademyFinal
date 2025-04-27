@@ -61,9 +61,10 @@ fun StoreScreen(
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
-        }
-    ) {
+        },
+        ) { paddingValues ->
         StoreScreenContent(
+            modifier = Modifier.padding(paddingValues),
             state = viewModel.state,
             onIntent = viewModel::processIntent
         )
@@ -72,6 +73,7 @@ fun StoreScreen(
 
 @Composable
 fun StoreScreenContent(
+    modifier: Modifier = Modifier,
     state: StoreState,
     onIntent: (StoreIntent) -> Unit // Receive lambda for query change
 ) {

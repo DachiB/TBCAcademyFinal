@@ -1,7 +1,10 @@
 package com.example.tbcacademyfinal.data.local.keys
 
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.byteArrayPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.example.tbcacademyfinal.presentation.misc.ThemeType
 
 object PreferencesKeys {
     val SEEN_LANDING = booleanPreferencesKey("has_seen_landing")

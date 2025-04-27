@@ -54,16 +54,16 @@ class DataStoreRepositoryImpl @Inject constructor(
     }
 
     override fun shouldRememberUser(): Flow<Boolean> {
-        return dataStore.data.catch { /* Handle error */ }.map { prefs ->
+        return dataStore.data.map { prefs ->
             prefs[PreferencesKeys.SHOULD_REMEMBER_USER] ?: false // Default to false
         }
     }
 
-    override fun darkThemeFlow(): Flow<Boolean> =
+    override fun getAppTheme(): Flow<Boolean> =
         dataStore.data
-            .map { prefs -> prefs[DARK_THEME_KEY] ?: false }
+            .map { prefs -> prefs[DARK_THEME_KEY] == true }
 
-    override suspend fun setDarkTheme(isDark: Boolean) {
+    override suspend fun updateTheme(isDark: Boolean) {
         dataStore.edit { prefs ->
             prefs[DARK_THEME_KEY] = isDark
         }
@@ -81,5 +81,4 @@ class DataStoreRepositoryImpl @Inject constructor(
             preferences[LANGUAGE_KEY] ?: "en"
         }
     }
-
 }

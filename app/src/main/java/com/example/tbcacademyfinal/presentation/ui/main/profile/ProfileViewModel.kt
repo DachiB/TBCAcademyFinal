@@ -1,47 +1,60 @@
 package com.example.tbcacademyfinal.presentation.ui.main.profile
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.domain.usecase.user.GetUserUseCase
 import com.example.tbcacademyfinal.domain.usecase.user.LogOutUseCase
 import com.example.tbcacademyfinal.common.Resource
+import com.example.tbcacademyfinal.domain.usecase.language.GetLanguageUseCase
+import com.example.tbcacademyfinal.domain.usecase.language.SaveLanguageUseCase
+import com.example.tbcacademyfinal.domain.usecase.theme.GetThemeUseCase
+import com.example.tbcacademyfinal.domain.usecase.theme.SaveThemeUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Locale
 import javax.inject.Inject
 
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
-    private val getUserUseCase: GetUserUseCase, // UseCase now returns Flow<Resource<User>>
-    private val logoutUseCase: LogOutUseCase
-    // Removed theme/language UseCase injections
+    private val getUserUseCase: GetUserUseCase,
+    private val logoutUseCase: LogOutUseCase,
+    private val getThemeUseCase: GetThemeUseCase,
+    private val saveThemeUseCase: SaveThemeUseCase,
+    private val getLanguageUseCase: GetLanguageUseCase,
+    private val saveLanguageUseCase: SaveLanguageUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ProfileState())
-    val state = _state.asStateFlow()
+    var state by mutableStateOf(ProfileState())
+        private set
 
-    private val _event = MutableSharedFlow<ProfileSideEffect>(
-        replay = 0,
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val _event = MutableSharedFlow<ProfileSideEffect>()
     val event = _event.asSharedFlow()
 
     init {
-        processIntent(ProfileIntent.LoadProfileData)
+        loadData()
+        getCurrentTheme()
+        getCurrentLanguage()
     }
 
     fun processIntent(intent: ProfileIntent) {
         when (intent) {
             is ProfileIntent.LoadProfileData -> loadData()
             is ProfileIntent.LogoutClicked -> performLogout()
-            // Removed ThemeChanged and LanguageChanged cases
+            is ProfileIntent.LanguageChanged -> setLanguage(intent.language)
+            is ProfileIntent.ThemeChanged -> toggleTheme(intent.theme)
         }
     }
 
@@ -54,29 +67,26 @@ class ProfileViewModel @Inject constructor(
             getUserUseCase().collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _state.update { it.copy(isLoading = true, error = null) }
+                        state = state.copy(isLoading = true, error = null)
                     }
 
                     is Resource.Success -> {
                         // Get User object from success resource
                         val user = resource.data
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                userEmail = user.email, // Extract email from domain User model
-                                error = null
-                                // Update other fields here if added to state (e.g., displayName = user.displayName)
-                            )
-                        }
+                        state = state.copy(
+                            isLoading = false,
+                            userEmail = user.email, // Extract email from domain User model
+                            error = null
+                        )
+
                     }
 
                     is Resource.Error -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                error = resource.message // Set error message from resource
-                            )
-                        }
+                        state = state.copy(
+                            isLoading = false,
+                            error = resource.message // Set error message from resource
+                        )
+
                     }
                 }
             }
@@ -86,9 +96,39 @@ class ProfileViewModel @Inject constructor(
     private fun performLogout() {
         viewModelScope.launch {
             logoutUseCase()
-            _event.tryEmit(ProfileSideEffect.NavigateToLogin)
+            _event.emit(ProfileSideEffect.NavigateToLogin)
         }
     }
 
-    // Removed changeTheme and changeLanguage private functions
+
+    private fun toggleTheme(current: Boolean) {
+        viewModelScope.launch {
+            saveThemeUseCase(!current)
+            state = state.copy(isDarkTheme = !current)
+        }
+    }
+
+    private fun setLanguage(language: String) {
+        viewModelScope.launch {
+            saveLanguageUseCase(language)
+            state = state.copy(currentLanguage = language)
+        }
+    }
+
+    private fun getCurrentTheme() {
+        viewModelScope.launch {
+            getThemeUseCase().collect { isDarkTheme ->
+                state = state.copy(isDarkTheme = isDarkTheme)
+            }
+        }
+    }
+
+    private fun getCurrentLanguage() {
+        viewModelScope.launch {
+            getLanguageUseCase().collect { language ->
+                state = state.copy(currentLanguage = language)
+            }
+        }
+    }
+
 }

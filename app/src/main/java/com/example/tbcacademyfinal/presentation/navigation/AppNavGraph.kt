@@ -13,6 +13,7 @@ import com.example.tbcacademyfinal.presentation.ui.main.MainScreen
 import com.example.tbcacademyfinal.presentation.ui.main.ar_scene.ArSceneScreen
 import com.example.tbcacademyfinal.presentation.ui.main.details.DetailsScreen
 import com.example.tbcacademyfinal.presentation.ui.splash.SplashScreen
+import com.example.tbcacademyfinal.presentation.ui.tutorial.TutorialScreen
 
 @Composable
 fun AppNavGraph(
@@ -48,8 +49,8 @@ fun AppNavGraph(
         composable<Routes.LandingRoute> {
             LandingScreen(
                 // ViewModel handled internally
-                onNavigateToAuth = {
-                    navController.navigate(Routes.AuthGraphRoute) { // Go to auth graph
+                onNavigateToTutorial = {
+                    navController.navigate(Routes.TutorialGraphRoute) { // Go to auth graph
                         // Pop Landing off stack, user shouldn't go back to it after proceeding
                         popUpTo(Routes.LandingRoute) { inclusive = true }
                     }
@@ -57,10 +58,10 @@ fun AppNavGraph(
             )
         }
 
-        // 3. Authentication Nested Graph (Top Level)
+        tutorialGraph(navController)
+
         authGraph(navController)
 
-        // 4. Main Application Nested Graph (Top Level)
         mainGraph(navController)
     }
 }
@@ -114,10 +115,23 @@ fun NavGraphBuilder.authGraph(navController: NavHostController) {
     }
 }
 
-/**
- * Defines the navigation graph for the Main Application flow (post-authentication),
- * including the screen hosting the bottom navigation and other destinations like Details.
- */
+fun NavGraphBuilder.tutorialGraph(navController: NavHostController) {
+    navigation<Routes.TutorialGraphRoute>(
+        startDestination = Routes.TutorialRoute
+    ) {
+        composable<Routes.TutorialRoute> {
+            TutorialScreen(
+                onNavigateToLogin = {
+                    navController.navigate(Routes.AuthGraphRoute) {
+                        popUpTo(Routes.TutorialGraphRoute) { inclusive = true }
+                    }
+                },
+                onNavigateContinueTutorial = {}
+            )
+        }
+    }
+}
+
 fun NavGraphBuilder.mainGraph(navController: NavHostController) {
     // Use the MainGraphRoute object to define the nested graph
     navigation<Routes.MainGraphRoute>(

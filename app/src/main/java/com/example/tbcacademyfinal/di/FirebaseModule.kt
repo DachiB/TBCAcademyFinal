@@ -25,6 +25,6 @@ object FirebaseModule {
     @Provides
     @Singleton
     fun provideFirebaseFirestore(): FirebaseFirestore {
-        return Firebase.firestore // Use KTX extension
+        return Firebase.firestore
     }
 }

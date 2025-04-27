@@ -21,21 +21,21 @@ class MainActivity : ComponentActivity() {
 
     @Inject
     lateinit var dataStoreRepo: DataStoreRepository
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            val darkTheme by dataStoreRepo
-                .darkThemeFlow()               // Flow<Boolean> that falls back to system if unset
-                .collectAsState(
-                    initial = isSystemInDarkTheme()
-                )
+            val darkTheme by dataStoreRepo.getAppTheme()
+                .collectAsState(initial = isSystemInDarkTheme())
+
             TBCAcademyFinalTheme(darkTheme = darkTheme) {
                 val navController = rememberNavController()
                 AppNavGraph(navController)
             }
         }
     }
+
 }
 
 
@@ -44,3 +44,4 @@ class MainActivity : ComponentActivity() {
 fun Preview() {
     AppNavGraph(navController = rememberNavController())
 }
+

@@ -31,7 +31,6 @@ import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.presentation.theme.CreamWhite
 import com.example.tbcacademyfinal.presentation.theme.DarkBackground
 import com.example.tbcacademyfinal.presentation.theme.GoldAccent
-import com.example.tbcacademyfinal.presentation.theme.GreenVariant
 
 @Composable
 fun ThemeSwitcher(
@@ -55,7 +54,7 @@ fun ThemeSwitcher(
         .height(size)
         .clip(shape = parentShape)
         .clickable { onClick() }
-        .background(GreenVariant)
+        .background(CreamWhite)
 
     ) {
         Box(
@@ -84,8 +83,8 @@ fun ThemeSwitcher(
                     modifier = Modifier.size(iconSize),
                     painter = painterResource(id = R.drawable.ic_darkmode),
                     contentDescription = "Theme Icon",
-                    tint = if (darkTheme) MaterialTheme.colorScheme.onBackground
-                    else MaterialTheme.colorScheme.surface
+                    tint = if (darkTheme) MaterialTheme.colorScheme.surface
+                    else MaterialTheme.colorScheme.onBackground
                 )
             }
             Box(
@@ -96,8 +95,8 @@ fun ThemeSwitcher(
                     modifier = Modifier.size(iconSize),
                     painter = painterResource(id = R.drawable.ic_lightmode),
                     contentDescription = "Theme Icon",
-                    tint = if (darkTheme) MaterialTheme.colorScheme.onBackground
-                    else MaterialTheme.colorScheme.surface
+                    tint = if (darkTheme) MaterialTheme.colorScheme.surface
+                    else MaterialTheme.colorScheme.onBackground
                 )
             }
         }

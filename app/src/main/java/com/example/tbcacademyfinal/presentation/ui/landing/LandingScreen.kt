@@ -38,12 +38,12 @@ import kotlinx.coroutines.delay
 @Composable
 fun LandingScreen(
     viewModel: LandingViewModel = hiltViewModel(),
-    onNavigateToAuth: () -> Unit
+    onNavigateToTutorial: () -> Unit
 ) {
     LandingScreenContent(
         onProceedClicked = {
             viewModel.onProceed() // Mark landing as seen
-            onNavigateToAuth() // Trigger navigation via the lambda
+            onNavigateToTutorial() // Trigger navigation via the lambda
         }
     )
 }

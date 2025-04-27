@@ -32,6 +32,7 @@ class StoreViewModel @Inject constructor(
     private val _event = MutableSharedFlow<StoreSideEffect>()
     var event = _event.asSharedFlow()
 
+    private var allProducts: List<ProductUi> = emptyList()
     private var searchJob: Job? = null
 
     init {
@@ -133,5 +134,5 @@ class StoreViewModel @Inject constructor(
         }
     }
 
-    private var allProducts: List<ProductUi> = emptyList()
+
 }

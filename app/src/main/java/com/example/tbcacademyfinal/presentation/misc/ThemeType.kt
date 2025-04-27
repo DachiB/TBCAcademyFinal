@@ -1,3 +1,3 @@
 package com.example.tbcacademyfinal.presentation.misc
 
-enum class ThemeType { SYSTEM, LIGHT, DARK }
+enum class ThemeType { LIGHT, DARK }

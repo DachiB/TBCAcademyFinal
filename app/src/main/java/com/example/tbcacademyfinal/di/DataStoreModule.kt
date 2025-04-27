@@ -26,9 +26,6 @@ object DataStoreModule {
         return PreferenceDataStoreFactory.create(
             produceFile = { appContext.preferencesDataStoreFile(USER_PREFERENCES_NAME) }
         )
-        // Consider adding migrations if needed later:
-        // migrations = listOf(migration_1_2), // Example
-        // scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     }
 
 

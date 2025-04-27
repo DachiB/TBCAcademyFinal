@@ -19,8 +19,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -28,22 +26,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.common.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.LanguageToggleButton
-import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.SettingsViewModel
 import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.ThemeSwitcher
 
 
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
-    settingViewModel: SettingsViewModel = hiltViewModel(),
     onLogout: () -> Unit,
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
 
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
@@ -51,11 +45,9 @@ fun ProfileScreen(
         }
     }
 
-
     ProfileScreenContent(
-        state = state,
+        state = viewModel.state,
         processIntent = viewModel::processIntent,
-        settingsViewModel = settingViewModel
     )
 }
 
@@ -63,19 +55,19 @@ fun ProfileScreen(
 @Composable
 fun ProfileScreenContent(
     state: ProfileState,
-    settingsViewModel: SettingsViewModel,
     processIntent: (ProfileIntent) -> Unit
 ) {
-    val isDarkTheme by settingsViewModel.darkThemeFlow.collectAsState()
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.CenterHorizontally),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            horizontalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = stringResource(R.string.profile_title), // Keep title
@@ -83,21 +75,30 @@ fun ProfileScreenContent(
                 modifier = Modifier
                     .padding(bottom = 24.dp)
                     .align(Alignment.CenterVertically),
-                textAlign = TextAlign.Start
+                textAlign = TextAlign.Center
             )
             ThemeSwitcher(
                 size = 50.dp,
                 padding = 4.dp,
-                darkTheme = isDarkTheme,
-                onClick = { settingsViewModel.toggleTheme(isDarkTheme) }
+                darkTheme = state.isDarkTheme,
+                onClick = { processIntent(ProfileIntent.ThemeChanged(state.isDarkTheme)) }
             )
 
         }
-        LanguageToggleButton(settingsViewModel)
+
+
+        LanguageToggleButton(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            state, processIntent
+        )
 
         if (state.isLoading) {
-            CircularProgressIndicator()
-            Spacer(modifier = Modifier.weight(1f)) // Push logout to bottom
+            CircularProgressIndicator(
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 16.dp)
+            )
+            Spacer(modifier = Modifier.weight(1f))
         } else if (state.error != null) {
             Log.d("ProfileScreen", "Error: ${state.error}")
             Text(
@@ -109,18 +110,17 @@ fun ProfileScreenContent(
             Spacer(modifier = Modifier.weight(1f)) // Push logout to bottom
         } else {
             // Display User Email (Main Content)
+
+            Spacer(modifier = Modifier.weight(1f))
+
             Text(
-                // Use the updated string resource if desired, or just display email
                 text = "Email: ${state.userEmail}",
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(bottom = 16.dp)
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
             )
-
-            // --- Theme/Language UI Removed ---
-
-            Spacer(modifier = Modifier.weight(1f)) // Push logout button to bottom
-
-            // Logout Button (remains the same)
             Button(
                 onClick = { processIntent(ProfileIntent.LogoutClicked) },
                 modifier = Modifier.fillMaxWidth(),
@@ -138,6 +138,7 @@ fun ProfileScreenContent(
     }
 }
 
+
 // --- Previews (Update to reflect simplified state) ---
 @Preview(showBackground = true, name = "Profile Screen Light")
 @Composable
@@ -149,7 +150,6 @@ fun ProfileScreenPreviewLight() {
                 isLoading = false
             ), // Simplified state
             processIntent = {},
-            settingsViewModel = hiltViewModel()
         )
     }
 }
@@ -161,7 +161,6 @@ fun ProfileScreenPreviewLoading() {
         ProfileScreenContent(
             state = ProfileState(isLoading = true), // Simplified state
             processIntent = {},
-            settingsViewModel = hiltViewModel()
         )
     }
 }
@@ -176,7 +175,6 @@ fun ProfileScreenPreviewError() {
                 error = "Failed to load profile"
             ), // Simplified state
             processIntent = {},
-            settingsViewModel = hiltViewModel()
         )
     }
 }

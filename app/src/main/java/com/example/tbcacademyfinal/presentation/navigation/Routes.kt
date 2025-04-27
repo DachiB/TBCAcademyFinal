@@ -40,4 +40,11 @@ sealed class Routes {
 
     @Serializable
     data object ProfileRoute : Routes()
+
+    @Serializable
+    data object TutorialRoute : Routes()
+
+    @Serializable
+    data object TutorialGraphRoute : Routes()
+
 }
