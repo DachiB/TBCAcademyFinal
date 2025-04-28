@@ -26,13 +26,12 @@ class DetailsViewModel @Inject constructor(
 
     private val productId: String = savedStateHandle.toRoute<Routes.DetailsRoute>().productId
 
-    // Store the domain product separately to pass to AddToCollectionUseCase
     private var domainProduct: Product? = null
 
     private val _state = MutableStateFlow(DetailsState())
     val state: StateFlow<DetailsState> = _state.asStateFlow()
 
-    private val _event = MutableSharedFlow<DetailsSideEffect>(/*...*/)
+    private val _event = MutableSharedFlow<DetailsSideEffect>()
     val event: SharedFlow<DetailsSideEffect> = _event.asSharedFlow()
 
     init {
@@ -44,6 +43,7 @@ class DetailsViewModel @Inject constructor(
         when (intent) {
             is DetailsIntent.AddToCollectionClicked -> addToCollection()
             is DetailsIntent.NavigateBack -> emitNavigateBack()
+            is DetailsIntent.ClickedModel -> navigateToModelScreen(intent.productId)
         }
     }
 
@@ -54,6 +54,7 @@ class DetailsViewModel @Inject constructor(
                     is Resource.Loading -> {
                         _state.update { it.copy(isLoading = true, error = null) }
                     }
+
                     is Resource.Success -> {
                         domainProduct = resource.data // Store the domain product
                         _state.update {
@@ -65,11 +66,18 @@ class DetailsViewModel @Inject constructor(
                         }
                         // isAddedToCollection state is now handled by observeCollectionStatus
                     }
+
                     is Resource.Error -> {
                         _state.update { it.copy(isLoading = false, error = resource.message) }
                     }
                 }
             }
+        }
+    }
+
+    private fun navigateToModelScreen(productId: String) {
+        viewModelScope.launch {
+            _event.emit(DetailsSideEffect.NavigateToModel(productId))
         }
     }
 
@@ -101,10 +109,13 @@ class DetailsViewModel @Inject constructor(
                     // State will update automatically via observeCollectionStatus
                     _event.tryEmit(DetailsSideEffect.ShowAddedToCollectionMessage)
                 }
+
                 is Resource.Error -> {
                     _event.tryEmit(DetailsSideEffect.ShowError(result.message))
                 }
-                is Resource.Loading -> { /* Optional: Handle loading state for add */ }
+
+                is Resource.Loading -> { /* Optional: Handle loading state for add */
+                }
             }
         }
     }

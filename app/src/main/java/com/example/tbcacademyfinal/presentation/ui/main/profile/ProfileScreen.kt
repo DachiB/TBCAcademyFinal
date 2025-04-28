@@ -1,5 +1,6 @@
 package com.example.tbcacademyfinal.presentation.ui.main.profile
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,9 +16,13 @@ import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +38,8 @@ import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.Languag
 import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.ThemeSwitcher
 
 
+@OptIn(ExperimentalMaterial3Api::class)
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
@@ -45,22 +52,38 @@ fun ProfileScreen(
         }
     }
 
-    ProfileScreenContent(
-        state = viewModel.state,
-        processIntent = viewModel::processIntent,
-    )
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(R.string.profile_title))
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        }
+    ) { paddingValues ->
+        ProfileScreenContent(
+            modifier = Modifier.padding(paddingValues),
+            state = viewModel.state,
+            processIntent = viewModel::processIntent,
+        )
+    }
 }
 
 
 @Composable
 fun ProfileScreenContent(
+    modifier: Modifier = Modifier,
     state: ProfileState,
     processIntent: (ProfileIntent) -> Unit
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
-            .padding(16.dp)
+            .padding(16.dp),
     ) {
         Row(
             modifier = Modifier
@@ -69,13 +92,10 @@ fun ProfileScreenContent(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween,
         ) {
-            Text(
-                text = stringResource(R.string.profile_title), // Keep title
-                style = MaterialTheme.typography.headlineMedium,
-                modifier = Modifier
-                    .padding(bottom = 24.dp)
-                    .align(Alignment.CenterVertically),
-                textAlign = TextAlign.Center
+
+            LanguageToggleButton(
+                modifier = Modifier.align(Alignment.CenterVertically),
+                state, processIntent
             )
             ThemeSwitcher(
                 size = 50.dp,
@@ -85,12 +105,6 @@ fun ProfileScreenContent(
             )
 
         }
-
-
-        LanguageToggleButton(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            state, processIntent
-        )
 
         if (state.isLoading) {
             CircularProgressIndicator(

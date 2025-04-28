@@ -11,7 +11,6 @@ import com.example.tbcacademyfinal.domain.usecase.network.ObserveNetworkStatusUs
 import com.example.tbcacademyfinal.domain.usecase.products.GetProductsUseCase
 import com.example.tbcacademyfinal.domain.util.ConnectivityObserver
 import com.example.tbcacademyfinal.presentation.mapper.toUiModelList
-import com.example.tbcacademyfinal.presentation.model.ProductUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -32,9 +31,6 @@ class StoreViewModel @Inject constructor(
     private val _event = MutableSharedFlow<StoreSideEffect>()
     var event = _event.asSharedFlow()
 
-    private var allProducts: List<ProductUi> = emptyList()
-    private var availableCategories: List<String> = emptyList()
-
     private var searchJob: Job? = null
 
     init {
@@ -51,51 +47,39 @@ class StoreViewModel @Inject constructor(
                 searchJob = viewModelScope.launch {
                     state = state.copy(isSearching = true)
                     delay(500)
-                    performSearch(state.searchQuery)
+                    updateFilters()
                     state = state.copy(isSearching = false)
                 }
             }
 
             is StoreIntent.RetryButtonClicked -> {
-                viewModelScope.launch {
-                    _event.emit(StoreSideEffect.ShowErrorSnackbar("No Internet Connection"))
-                }
+                observeConnectivity()
             }
 
-            is StoreIntent.CategorySelected -> performFilter(intent.category)
+            is StoreIntent.CategorySelected -> {
+                state = state.copy(selectedCategory = intent.category)
+                updateFilters()
+            }
 
             is StoreIntent.ClearCategoryFilter -> {
-                state = state.copy(
-                    selectedCategory = null,
-                    products = allProducts
-                )
+                state = state.copy(selectedCategory = null)
+                updateFilters()
             }
         }
     }
 
-    private fun performSearch(query: String) {
-        val trimmedQuery = query.trim()
-        state = state.copy(
-            products = allProducts.filter { product ->
-                (trimmedQuery.isBlank() || product.name.contains(
-                    trimmedQuery,
-                    ignoreCase = true
-                )) && (state.selectedCategory == null || product.category == state.selectedCategory)
-            }
-        )
+    private fun updateFilters() {
+        val query = state.searchQuery.trim()
+        val category = state.selectedCategory
+
+        val filtered = state.allProducts.filter { product ->
+            (query.isBlank() || product.name.contains(query, ignoreCase = true)) &&
+                    (category == null || product.category == category)
+        }
+
+        state = state.copy(currentProducts = filtered)
     }
 
-    private fun performFilter(category: String) {
-        state = state.copy(
-            selectedCategory = category,
-            products = allProducts.filter { product ->
-                product.category == category && (state.searchQuery.isBlank() || product.name.contains(
-                    state.searchQuery,
-                    ignoreCase = true
-                ))
-            }
-        )
-    }
 
     private fun navigateToDetails(productId: String) {
         viewModelScope.launch {
@@ -114,15 +98,19 @@ class StoreViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        allProducts = resource.data.toUiModelList()
-                        availableCategories =
-                            allProducts.map { it.category }.filter { it.isNotBlank() }.distinct()
-                                .sorted()
+                        val productList = resource.data.toUiModelList()
+                        val categoryList = productList
+                            .map { it.category }
+                            .filter { it.isNotBlank() }
+                            .distinct()
+                            .sorted()
+
                         state.copy(
                             isLoading = false,
-                            products = allProducts,
-                            availableCategories = availableCategories,
-                            error = null
+                            error = null,
+                            allProducts = productList,
+                            currentProducts = productList,
+                            availableCategories = categoryList
                         )
                     }
                 }
@@ -141,12 +129,17 @@ class StoreViewModel @Inject constructor(
                     }
 
                     ConnectivityObserver.Status.Lost -> {
-                        Log.d("NetworkStatus", "Lost")
+                        viewModelScope.launch {
+                            _event.emit(StoreSideEffect.ShowErrorSnackbar("No Internet Connection"))
+                        }
                         state.copy(isNetworkAvailable = false)
+
                     }
 
                     ConnectivityObserver.Status.Unavailable -> {
-                        Log.d("NetworkStatus", "Unavailable")
+                        viewModelScope.launch {
+                            _event.emit(StoreSideEffect.ShowErrorSnackbar("No Internet Connection"))
+                        }
                         state.copy(isNetworkAvailable = false)
                     }
 

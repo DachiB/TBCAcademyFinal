@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.ksp) apply false
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.kotlin.compose) apply false
+    id("com.google.firebase.crashlytics") version "3.0.3" apply false
 }
 
 buildscript {

@@ -8,6 +8,7 @@ plugins {
     id("kotlin-parcelize")
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.services)
+    id("com.google.firebase.crashlytics")
 }
 
 android {
@@ -110,9 +111,9 @@ dependencies {
     implementation(libs.coil.network.okhttp)
     implementation(libs.androidx.constraintlayout.compose)
     implementation(libs.sceneview)
-    implementation(libs.arsceneview)
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
+    implementation("io.github.sceneview:arsceneview:2.3.0")
     implementation(libs.ar.core)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)

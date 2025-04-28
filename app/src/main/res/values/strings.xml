@@ -52,4 +52,5 @@
     <string name="offline_mode">Offline</string>
     <string name="no_such_product_s">No such product(s)</string>
     <string name="buy_collection">Buy Collection</string>
+    <string name="view_model_in_3d">3D View</string>
 </resources>

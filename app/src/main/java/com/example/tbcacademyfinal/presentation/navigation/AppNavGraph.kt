@@ -13,6 +13,7 @@ import com.example.tbcacademyfinal.presentation.ui.landing.LandingScreen
 import com.example.tbcacademyfinal.presentation.ui.main.MainScreen
 import com.example.tbcacademyfinal.presentation.ui.main.ar_scene.ArSceneScreen
 import com.example.tbcacademyfinal.presentation.ui.main.details.DetailsScreen
+import com.example.tbcacademyfinal.presentation.ui.main.model_scene.ModelScreen
 import com.example.tbcacademyfinal.presentation.ui.splash.SplashScreen
 import com.example.tbcacademyfinal.presentation.ui.tutorial.TutorialScreen
 
@@ -158,12 +159,20 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
             // Use .toRoute() to get the type-safe argument object
             DetailsScreen(
                 // Assuming DetailsScreen exists
-                onNavigateBack = { navController.popBackStack() }, // Handle back navigation
-                // Pass main navController for navigating back etc.
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToModelScene = { productId ->
+                    navController.navigate(Routes.ModelRoute(productId))
+                }
             )
         }
         composable<Routes.ArSceneRoute> {
             ArSceneScreen(
+                onNavigateBack = { navController.popBackStack() },
+            )
+        }
+
+        composable<Routes.ModelRoute> {
+            ModelScreen(
                 onNavigateBack = { navController.popBackStack() },
             )
         }

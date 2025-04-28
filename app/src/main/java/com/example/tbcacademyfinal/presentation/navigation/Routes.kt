@@ -42,6 +42,9 @@ sealed class Routes {
     data object ProfileRoute : Routes()
 
     @Serializable
+    data class ModelRoute(val productId: String) : Routes()
+
+    @Serializable
     data object TutorialRoute : Routes()
 
     @Serializable

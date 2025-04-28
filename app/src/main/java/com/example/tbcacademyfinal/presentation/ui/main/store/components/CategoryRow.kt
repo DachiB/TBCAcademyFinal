@@ -1,7 +1,7 @@
-package com.example.tbcacademyfinal.presentation.ui.main.store
+package com.example.tbcacademyfinal.presentation.ui.main.store.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -15,13 +15,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.example.tbcacademyfinal.R
+import com.example.tbcacademyfinal.presentation.theme.WalnutBrown
+import com.example.tbcacademyfinal.presentation.ui.main.store.StoreIntent
+import com.example.tbcacademyfinal.presentation.ui.main.store.StoreState
 
 
 @Composable
 fun CategoryRow(state: StoreState, onIntent: (StoreIntent) -> Unit) {
     LazyRow(
         modifier = Modifier.fillMaxWidth(),
-        contentPadding = PaddingValues(horizontal = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
@@ -46,6 +48,10 @@ fun CategoryRow(state: StoreState, onIntent: (StoreIntent) -> Unit) {
         items(state.availableCategories) { category ->
             val isSelected = state.selectedCategory == category
             FilterChip(
+                border = BorderStroke(
+                    width = 1.dp,
+                    color = WalnutBrown
+                ),
                 selected = isSelected,
                 onClick = { onIntent(StoreIntent.CategorySelected(category)) },
                 label = {

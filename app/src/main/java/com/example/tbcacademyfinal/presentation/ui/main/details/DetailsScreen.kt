@@ -8,6 +8,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check // For Added to collection state
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -32,8 +33,10 @@ import com.example.tbcacademyfinal.common.ImageLoader
 @Composable
 fun DetailsScreen(
     // Product ID is implicitly retrieved by the ViewModel via SavedStateHandle
-    onNavigateBack: () -> Unit, // Needed for back navigation
-    viewModel: DetailsViewModel = hiltViewModel()
+    // Needed for back navigation
+    viewModel: DetailsViewModel = hiltViewModel(),
+    onNavigateBack: () -> Unit,
+    onNavigateToModelScene: (productId: String) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() } // For showing messages
@@ -55,6 +58,8 @@ fun DetailsScreen(
                     duration = SnackbarDuration.Long
                 )
             }
+
+            is DetailsSideEffect.NavigateToModel -> onNavigateToModelScene(effect.productId)
         }
     }
 
@@ -125,7 +130,8 @@ fun DetailsScreenContent(
                     ProductDetails(
                         product = state.product,
                         isAddedToCollection = state.isAddedToCollection,
-                        onAddToCollection = { onIntent(DetailsIntent.AddToCollectionClicked) }
+                        onAddToCollection = { onIntent(DetailsIntent.AddToCollectionClicked) },
+                        onViewModelClicked = { onIntent(DetailsIntent.ClickedModel(state.product.id)) }
                     )
                 }
             }
@@ -133,11 +139,13 @@ fun DetailsScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetails(
     product: ProductUi,
     isAddedToCollection: Boolean,
     onAddToCollection: () -> Unit,
+    onViewModelClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -189,6 +197,20 @@ fun ProductDetails(
 
         Spacer(modifier = Modifier.weight(1f)) // Push button towards bottom
 
+        Button(
+            onClick = onViewModelClicked,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 16.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Edit,
+                contentDescription = null,
+                modifier = Modifier.size(ButtonDefaults.IconSize)
+            )
+            Spacer(modifier = Modifier.size(ButtonDefaults.IconSpacing))
+            Text(stringResource(id = R.string.view_model_in_3d))
+        }
         Button(
             onClick = onAddToCollection,
             modifier = Modifier

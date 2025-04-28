@@ -12,6 +12,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -21,8 +22,9 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -35,13 +37,16 @@ import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.common.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.model.ProductUi
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
+import com.example.tbcacademyfinal.presentation.ui.main.store.components.CategoryRow
+import com.example.tbcacademyfinal.presentation.ui.main.store.components.ProductGrid
+import com.example.tbcacademyfinal.presentation.ui.main.store.components.ProductItem
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StoreScreen(
     viewModel: StoreViewModel = hiltViewModel(),
     onNavigateToDetails: (productId: String) -> Unit,
 ) {
-    // Handle side effects like navigation
     val snackbarHostState = remember { SnackbarHostState() }
 
     CollectSideEffect(flow = viewModel.event) { effect ->
@@ -61,8 +66,18 @@ fun StoreScreen(
     Scaffold(
         snackbarHost = {
             SnackbarHost(hostState = snackbarHostState)
-        },
-        ) { paddingValues ->
+        }, topBar = {
+            TopAppBar(
+                title = {
+                    Text(text = stringResource(R.string.app_name))
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
+            )
+        }
+    ) { paddingValues ->
         StoreScreenContent(
             modifier = Modifier.padding(paddingValues),
             state = viewModel.state,
@@ -93,13 +108,9 @@ fun StoreScreenContent(
             }
         } else {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(
-                        top = 8.dp,
-                        start = 16.dp,
-                        end = 16.dp
-                    ),
+                modifier = modifier.padding(
+                    horizontal = 16.dp, vertical = 8.dp
+                ),
             ) {
                 OutlinedTextField(
                     value = state.searchQuery,
@@ -133,7 +144,7 @@ fun StoreScreenContent(
                             color = MaterialTheme.colorScheme.primary
                         )
                     }
-                } else if (state.products.isNotEmpty()) {
+                } else if (state.currentProducts.isNotEmpty()) {
                     ProductGrid(
                         state = state,
                         onProductClick = { productId ->
@@ -228,7 +239,7 @@ fun StoreScreenContentPreview() {
         StoreScreenContent(
             state = StoreState(
                 isLoading = false,
-                products = sampleProducts,
+                currentProducts = sampleProducts,
                 isNetworkAvailable = true
             ),
             onIntent = {}

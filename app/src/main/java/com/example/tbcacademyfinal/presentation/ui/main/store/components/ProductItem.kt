@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.presentation.ui.main.store
+package com.example.tbcacademyfinal.presentation.ui.main.store.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
