@@ -85,14 +85,11 @@ fun LoginScreenContent(
     // Accept the intent processor function
     processIntent: (LoginIntent) -> Unit
 ) {
-    var hasVisitedOnce by remember { mutableStateOf(false) }
     var contentVisible by remember { mutableStateOf(false) }
 
-
     LaunchedEffect(Unit) {
-        delay(if (hasVisitedOnce) 0 else 200) // Small delay before starting animation
+        delay(200) // Small delay before starting animation
         contentVisible = true
-        hasVisitedOnce = true
     }
 
 
@@ -244,7 +241,7 @@ fun LoginScreenContent(
                                 isChecked
                             )
                         )
-                    })
+                    }, enabled = !state.isLoading)
                     // Make the text clickable to toggle the checkbox too
                     Text(
                         text = stringResource(R.string.login_remember_me), // Add string

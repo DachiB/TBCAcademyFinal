@@ -1,5 +1,6 @@
 package com.example.tbcacademyfinal.presentation.navigation
 
+import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -123,10 +124,16 @@ fun NavGraphBuilder.tutorialGraph(navController: NavHostController) {
             TutorialScreen(
                 onNavigateToLogin = {
                     navController.navigate(Routes.AuthGraphRoute) {
+                        Log.d("Navigation", "Navigating to AuthGraphRoute")
                         popUpTo(Routes.TutorialGraphRoute) { inclusive = true }
                     }
                 },
-                onNavigateContinueTutorial = {}
+                onNavigateContinueTutorial = {
+                    navController.navigate(Routes.AuthGraphRoute) {
+                        Log.d("Navigation", "Navigating to AuthGraphRoute")
+                        popUpTo(Routes.TutorialGraphRoute) { inclusive = true }
+                    }
+                }
             )
         }
     }

@@ -33,6 +33,8 @@ class StoreViewModel @Inject constructor(
     var event = _event.asSharedFlow()
 
     private var allProducts: List<ProductUi> = emptyList()
+    private var availableCategories: List<String> = emptyList()
+
     private var searchJob: Job? = null
 
     init {
@@ -60,20 +62,39 @@ class StoreViewModel @Inject constructor(
                 }
             }
 
+            is StoreIntent.CategorySelected -> performFilter(intent.category)
 
+            is StoreIntent.ClearCategoryFilter -> {
+                state = state.copy(
+                    selectedCategory = null,
+                    products = allProducts
+                )
+            }
         }
     }
 
     private fun performSearch(query: String) {
-        val list = if (query.isBlank()) {
-            allProducts
-        } else {
-            allProducts.filter { product ->
-                product.name.contains(query, ignoreCase = true) ||
-                        product.description.contains(query, ignoreCase = true)
+        val trimmedQuery = query.trim()
+        state = state.copy(
+            products = allProducts.filter { product ->
+                (trimmedQuery.isBlank() || product.name.contains(
+                    trimmedQuery,
+                    ignoreCase = true
+                )) && (state.selectedCategory == null || product.category == state.selectedCategory)
             }
-        }
-        state = state.copy(products = list)
+        )
+    }
+
+    private fun performFilter(category: String) {
+        state = state.copy(
+            selectedCategory = category,
+            products = allProducts.filter { product ->
+                product.category == category && (state.searchQuery.isBlank() || product.name.contains(
+                    state.searchQuery,
+                    ignoreCase = true
+                ))
+            }
+        )
     }
 
     private fun navigateToDetails(productId: String) {
@@ -94,9 +115,13 @@ class StoreViewModel @Inject constructor(
 
                     is Resource.Success -> {
                         allProducts = resource.data.toUiModelList()
+                        availableCategories =
+                            allProducts.map { it.category }.filter { it.isNotBlank() }.distinct()
+                                .sorted()
                         state.copy(
                             isLoading = false,
                             products = allProducts,
+                            availableCategories = availableCategories,
                             error = null
                         )
                     }

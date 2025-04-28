@@ -120,6 +120,7 @@ fun StoreScreenContent(
 
                     }
                 )
+                CategoryRow(state = state, onIntent = onIntent)
                 if (state.isSearching) {
                     Box(
                         modifier = Modifier

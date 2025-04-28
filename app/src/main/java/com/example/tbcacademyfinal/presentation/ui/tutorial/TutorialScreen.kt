@@ -1,5 +1,6 @@
 package com.example.tbcacademyfinal.presentation.ui.tutorial
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
@@ -25,7 +26,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.common.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.theme.CreamWhite
 import com.example.tbcacademyfinal.presentation.theme.GreenVariant
-import com.example.tbcacademyfinal.presentation.ui.main.collection.CollectionSideEffect
 import kotlinx.coroutines.delay
 
 @Composable
@@ -36,8 +36,8 @@ fun TutorialScreen(
 ) {
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
-            is TutorialSideEffect.NavigateToLogin -> onNavigateToLogin()
-            is TutorialSideEffect.NavigateToNextTutorial -> onNavigateContinueTutorial()
+            is TutorialSideEffect.NavigateToLogin -> onNavigateToLogin.invoke()
+            is TutorialSideEffect.NavigateToNextTutorial -> onNavigateContinueTutorial.invoke()
         }
     }
     TutorialContent(onIntent = viewModel::processIntent)
