@@ -7,5 +7,5 @@ data class LoginState(
     val rememberMe: Boolean = false,
     val isLoading: Boolean = false,
     val errorMessage: String? = null,
-    val isLoginSuccess: Boolean = false
+    val isLoginSuccess: Boolean = false,
 )

@@ -7,4 +7,9 @@ sealed interface StoreIntent {
     data object RetryButtonClicked : StoreIntent
     data class CategorySelected(val category: String) : StoreIntent
     data object ClearCategoryFilter : StoreIntent
+    data class PriceRangeChanged(val min: Float, val max: Float) : StoreIntent
+    data class HasModelOnlyChanged(val hasModel: Boolean) : StoreIntent
+    data class FilterButtonClicked(val isFiltering: Boolean) : StoreIntent
+    data object ClickedAddDailyCollection : StoreIntent
+    data object ClickedAddItemOfDay : StoreIntent
 }

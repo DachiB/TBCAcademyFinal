@@ -8,9 +8,7 @@ import javax.inject.Inject
 class AddToCollectionUseCase @Inject constructor(
     private val collectionRepository: CollectionRepository
 ) {
-    // Needs the full product to get all necessary fields for the entity
     suspend operator fun invoke(product: Product): Resource<Unit> {
-        // Basic validation could be added here if needed
         if (product.modelFile.isBlank()) {
             return Resource.Error("Product cannot be added to collection without a model file.")
         }

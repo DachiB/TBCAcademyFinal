@@ -73,12 +73,8 @@ fun ArSceneScreen(
     viewModel: ArSceneViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
     ArScreenContent(
-        state = state,
-        onIntent = viewModel::processIntent,
-        onTrackingFailureChanged = viewModel::onTrackingFailureChanged, // Pass callback
+        state = viewModel.state,
         onNavigateBack = { onNavigateBack() }
     )
 }
@@ -87,15 +83,12 @@ fun ArSceneScreen(
 @Composable
 fun ArScreenContent(
     state: ArSceneState,
-    onIntent: (ArSceneIntent) -> Unit,
-    onTrackingFailureChanged: (TrackingFailureReason?) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-        // The destroy calls are automatically made when their disposable effect leaves
-        // the composition or its key changes.
+
         val engine = rememberEngine()
         val modelLoader = rememberModelLoader(engine)
         val materialLoader = rememberMaterialLoader(engine)
@@ -177,12 +170,11 @@ fun ArScreenContent(
         )
 
 
-// Back Button (Top Left)
         IconButton(
             onClick = onNavigateBack,
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .systemBarsPadding() // Adjust for status bar
+                .systemBarsPadding()
                 .padding(16.dp)
         ) {
             Icon(
@@ -193,7 +185,6 @@ fun ArScreenContent(
         }
 
 
-// Instruction Text (Top Center)
         Text(
             modifier = Modifier
                 .systemBarsPadding()
@@ -203,14 +194,13 @@ fun ArScreenContent(
                     top = 16.dp,
                     start = 72.dp,
                     end = 72.dp
-                ), // Add padding to avoid button overlap
+                ),
             textAlign = TextAlign.Center,
-            fontSize = 16.sp, // Slightly smaller
+            fontSize = 16.sp,
             color = Color.White,
-            text = state.instructionText // Use text from ViewModel state
+            text = state.instructionText
         )
 
-// Collection Item Selector (Bottom)
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
@@ -299,7 +289,6 @@ fun CollectionThumbnail(
 }
 
 
-// Adapted node creation function
 fun createAnchorNode(
     engine: Engine,
     modelLoader: ModelLoader,
@@ -336,52 +325,3 @@ fun createAnchorNode(
     }
     return anchorNode
 }
-////
-////
-////// --- Previews (AR Previews are difficult, focus on UI parts) ---
-////@Preview(showBackground = true)
-////@Composable
-////fun ArScreenUIPreview() {
-////    TBCAcademyFinalTheme {
-////        val sampleItems = listOf(
-////            CollectionItemUi("p1", "Sofa", "url1", "models/sofa.glb"),
-////            CollectionItemUi("p2", "Lamp", "url2", "models/lamp.glb")
-////        )
-////        ArScreenContent(
-////            state = ArSceneState(
-////                isLoadingCollection = false,
-////                availableItems = sampleItems,
-////                selectedItemModelFile = "models/sofa.glb",
-////                instructionText = "Tap surface to place",
-////                showPlaneRenderer = true
-////            ),
-////            onIntent = {},
-////            onTrackingFailureChanged = {},
-////            onNavigateBack = {}
-////        )
-////    }
-////}
-////
-////@Preview
-////@Composable
-////fun CollectionThumbnailPreview() {
-////    TBCAcademyFinalTheme {
-////        CollectionThumbnail(
-////            item = CollectionItemUi("p1", "Sofa", "", "m1"),
-////            isSelected = false,
-////            onClick = {}
-////        )
-////    }
-////}
-////
-////@Preview
-////@Composable
-////fun CollectionThumbnailSelectedPreview() {
-////    TBCAcademyFinalTheme {
-////        CollectionThumbnail(
-////            item = CollectionItemUi("p1", "Sofa", "", "m1"),
-////            isSelected = true,
-////            onClick = {}
-////        )
-////    }
-////}

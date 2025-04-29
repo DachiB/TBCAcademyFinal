@@ -1,17 +1,36 @@
 package com.example.tbcacademyfinal.presentation.ui.main.details
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Check // For Added to collection state
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material3.*
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -22,12 +41,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tbcacademyfinal.R
-import com.example.tbcacademyfinal.presentation.model.ProductUi
-import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import com.example.tbcacademyfinal.common.CollectSideEffect
 import com.example.tbcacademyfinal.common.ImageLoader
+import com.example.tbcacademyfinal.presentation.model.ProductUi
+import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 
 
 @Composable
@@ -38,24 +56,26 @@ fun DetailsScreen(
     onNavigateBack: () -> Unit,
     onNavigateToModelScene: (productId: String) -> Unit
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() } // For showing messages
 
-    // Handle Side Effects (e.g., navigation, snackbars)
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
             is DetailsSideEffect.NavigateBack -> onNavigateBack()
             is DetailsSideEffect.ShowAddedToCollectionMessage -> {
                 snackbarHostState.showSnackbar(
-                    message = "Added to collection!", // TODO: Use string resource
-                    duration = SnackbarDuration.Short
+                    message = "Added to collection!",
+                    duration = SnackbarDuration.Short,
+                    actionLabel = "Dismiss",
+                    withDismissAction = true
                 )
             }
 
             is DetailsSideEffect.ShowError -> {
                 snackbarHostState.showSnackbar(
-                    message = "Error: ${effect.message}", // TODO: Use string resource
-                    duration = SnackbarDuration.Long
+                    message = "Error: ${effect.message}",
+                    duration = SnackbarDuration.Long,
+                    actionLabel = "Dismiss",
+                    withDismissAction = true
                 )
             }
 
@@ -64,7 +84,7 @@ fun DetailsScreen(
     }
 
     DetailsScreenContent(
-        state = state,
+        state = viewModel.state,
         snackbarHostState = snackbarHostState,
         onIntent = viewModel::processIntent,
         onNavigateBack = { onNavigateBack() } // Direct navigation back
@@ -184,7 +204,7 @@ fun ProductDetails(
         )
 
         Text(
-            text = "Category: ${product.category}", // TODO: Use string resource
+            text = "Category: ${product.category}",
             style = MaterialTheme.typography.labelMedium,
             modifier = Modifier.padding(bottom = 16.dp)
         )
@@ -242,10 +262,10 @@ fun DetailsScreenContentPreview() {
             "p1",
             "Modern Sofa",
             "A very comfortable sofa for your living room.",
+            1299.99,
             "$1299.99",
-            "",
             "Sofas",
-            "m1"
+            "", ""
         )
         DetailsScreenContent(
             state = DetailsState(isLoading = false, product = sampleProduct),
@@ -274,7 +294,8 @@ fun DetailsScreenLoadingPreview() {
 fun DetailsScreenAddedPreview() {
     TBCAcademyFinalTheme {
         val sampleProduct =
-            ProductUi("p1", "Modern Sofa", "Desc", "$1299.99", "", "Sofas", "m1")
+            ProductUi("p1", "Modern Sofa", "Desc"
+                , 1299.99, "$1299.99", "", "", "")
         DetailsScreenContent(
             state = DetailsState(
                 isLoading = false,

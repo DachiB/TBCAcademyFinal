@@ -97,19 +97,14 @@ fun NavGraphBuilder.authGraph(navController: NavHostController) {
             )
         }
 
-        // Register Screen
         composable<Routes.RegisterRoute> {
             RegisterScreen(
-                // ViewModel handled internally
                 onRegisterSuccess = {
-                    // Navigate to the Main graph after successful registration
                     navController.navigate(Routes.MainGraphRoute) {
-                        // Pop the entire Auth graph off the back stack
                         popUpTo(Routes.AuthGraphRoute) { inclusive = true }
                     }
                 },
                 onNavigateBackToLogin = {
-                    // Simply pop the current screen (Register) to go back to Login
                     navController.popBackStack()
                 }
             )
@@ -125,40 +120,24 @@ fun NavGraphBuilder.tutorialGraph(navController: NavHostController) {
             TutorialScreen(
                 onNavigateToLogin = {
                     navController.navigate(Routes.AuthGraphRoute) {
-                        Log.d("Navigation", "Navigating to AuthGraphRoute")
                         popUpTo(Routes.TutorialGraphRoute) { inclusive = true }
                     }
                 },
-                onNavigateContinueTutorial = {
-                    navController.navigate(Routes.AuthGraphRoute) {
-                        Log.d("Navigation", "Navigating to AuthGraphRoute")
-                        popUpTo(Routes.TutorialGraphRoute) { inclusive = true }
-                    }
-                }
             )
         }
     }
 }
 
 fun NavGraphBuilder.mainGraph(navController: NavHostController) {
-    // Use the MainGraphRoute object to define the nested graph
     navigation<Routes.MainGraphRoute>(
-        startDestination = Routes.MainContainerRoute // Start with the screen that has the Bottom Nav
+        startDestination = Routes.MainContainerRoute
     ) {
-        // Main Container Screen (Hosts Bottom Navigation)
         composable<Routes.MainContainerRoute> {
-            // MainScreen internally manages navigation between Store/AR/Profile tabs
-            // using its own NavController (bottomBarNavController).
-            // We pass the main `navController` here for actions *leaving* the
-            // bottom nav flow (e.g., navigating to Details, or Logging Out from Profile).
             MainScreen(mainNavController = navController)
         }
 
-        // Details Screen (Navigated to FROM StoreScreen, hence part of Main graph)
         composable<Routes.DetailsRoute> {
-            // Use .toRoute() to get the type-safe argument object
             DetailsScreen(
-                // Assuming DetailsScreen exists
                 onNavigateBack = { navController.popBackStack() },
                 onNavigateToModelScene = { productId ->
                     navController.navigate(Routes.ModelRoute(productId))
@@ -176,12 +155,5 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
                 onNavigateBack = { navController.popBackStack() },
             )
         }
-
-        // --- Note on Bottom Bar Destinations ---
-        // StoreRoute, ArCollectionRoute, and ProfileRoute composables are defined *inside*
-        // the NavHost within MainScreen.kt, controlled by the `bottomBarNavController`.
-        // They don't need separate `composable` entries here in the mainGraph definition,
-        // unless you wanted to allow deep-linking directly to them via the `mainNavController`
-        // (which adds complexity). The current setup keeps them encapsulated within MainScreen.
     }
 }

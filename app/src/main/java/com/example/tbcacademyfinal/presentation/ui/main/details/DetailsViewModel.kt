@@ -1,18 +1,24 @@
 package com.example.tbcacademyfinal.presentation.ui.main.details
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
-import com.example.tbcacademyfinal.domain.model.Product
+import com.example.tbcacademyfinal.common.Resource
 import com.example.tbcacademyfinal.domain.usecase.collection.AddToCollectionUseCase
 import com.example.tbcacademyfinal.domain.usecase.collection.IsItemInCollectionUseCase
 import com.example.tbcacademyfinal.domain.usecase.products.GetProductDetailsUseCase
+import com.example.tbcacademyfinal.presentation.mapper.toDomainModel
 import com.example.tbcacademyfinal.presentation.mapper.toUiModel
 import com.example.tbcacademyfinal.presentation.navigation.Routes
-import com.example.tbcacademyfinal.common.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,17 +32,15 @@ class DetailsViewModel @Inject constructor(
 
     private val productId: String = savedStateHandle.toRoute<Routes.DetailsRoute>().productId
 
-    private var domainProduct: Product? = null
-
-    private val _state = MutableStateFlow(DetailsState())
-    val state: StateFlow<DetailsState> = _state.asStateFlow()
+    var state by mutableStateOf(DetailsState())
+        private set
 
     private val _event = MutableSharedFlow<DetailsSideEffect>()
     val event: SharedFlow<DetailsSideEffect> = _event.asSharedFlow()
 
     init {
         fetchProductDetails()
-        observeCollectionStatus() // Start observing if item is in collection
+        observeCollectionStatus()
     }
 
     fun processIntent(intent: DetailsIntent) {
@@ -52,23 +56,21 @@ class DetailsViewModel @Inject constructor(
             getProductDetailsUseCase(productId).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
-                        _state.update { it.copy(isLoading = true, error = null) }
+                        state = state.copy(isLoading = true, error = null)
                     }
 
                     is Resource.Success -> {
-                        domainProduct = resource.data // Store the domain product
-                        _state.update {
-                            it.copy(
+                        state =
+                            state.copy(
                                 isLoading = false,
                                 product = resource.data.toUiModel(),
                                 error = null
                             )
-                        }
-                        // isAddedToCollection state is now handled by observeCollectionStatus
                     }
 
+
                     is Resource.Error -> {
-                        _state.update { it.copy(isLoading = false, error = resource.message) }
+                        state = state.copy(isLoading = false, error = resource.message)
                     }
                 }
             }
@@ -81,46 +83,47 @@ class DetailsViewModel @Inject constructor(
         }
     }
 
-    // Observe if the current product ID exists in the collection
     private fun observeCollectionStatus() {
         viewModelScope.launch {
             isItemInCollectionUseCase(productId)
                 .distinctUntilChanged() // Only react to actual changes
                 .collect { isInCollection ->
-                    _state.update { it.copy(isAddedToCollection = isInCollection) }
+                    state = state.copy(isAddedToCollection = isInCollection)
                 }
         }
     }
 
     private fun addToCollection() {
-        val currentDomainProduct = domainProduct // Use stored domain product
-        if (currentDomainProduct == null) {
-            _event.tryEmit(DetailsSideEffect.ShowError("Product data not loaded yet."))
-            return
-        }
+        val currentDomainProduct = state.product
+
 
         viewModelScope.launch {
-            // Prevent adding if already added (UI should disable button, but double check)
-            if (state.value.isAddedToCollection) return@launch
+            if (currentDomainProduct == null) {
+                _event.emit(DetailsSideEffect.ShowError("Product data not loaded yet."))
+                return@launch
+            }
+            if (state.isAddedToCollection) return@launch
 
-            val result = addToCollectionUseCase(currentDomainProduct) // Pass domain product
+            val result =
+                addToCollectionUseCase(currentDomainProduct.toDomainModel())
             when (result) {
                 is Resource.Success -> {
                     // State will update automatically via observeCollectionStatus
-                    _event.tryEmit(DetailsSideEffect.ShowAddedToCollectionMessage)
+                    _event.emit(DetailsSideEffect.ShowAddedToCollectionMessage)
                 }
 
                 is Resource.Error -> {
-                    _event.tryEmit(DetailsSideEffect.ShowError(result.message))
+                    _event.emit(DetailsSideEffect.ShowError(result.message))
                 }
 
-                is Resource.Loading -> { /* Optional: Handle loading state for add */
-                }
+                is Resource.Loading -> {}
             }
         }
     }
 
     private fun emitNavigateBack() {
-        _event.tryEmit(DetailsSideEffect.NavigateBack)
+        viewModelScope.launch {
+            _event.emit(DetailsSideEffect.NavigateBack)
+        }
     }
 }

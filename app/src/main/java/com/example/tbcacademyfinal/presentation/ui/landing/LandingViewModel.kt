@@ -4,19 +4,30 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LandingViewModel @Inject constructor(
-    private val dataStoreRepository: DataStoreRepository
-) : ViewModel() {
+class LandingViewModel @Inject constructor() : ViewModel() {
 
-    // This function will be called when the user proceeds from the landing page.
-    fun onProceed() {
+    private val _event = MutableSharedFlow<LandingSideEffect>()
+    val event = _event.asSharedFlow()
+
+    fun processIntent(
+        intent: LandingIntent,
+    ) {
+        when (intent) {
+            is LandingIntent.PressedProceed -> {
+                navigateToTutorial()
+            }
+        }
+    }
+
+    private fun navigateToTutorial() {
         viewModelScope.launch {
-            dataStoreRepository.setHasSeenLanding(true)
-            // No navigation event needed here, navigation is handled by the Composable's lambda
+            _event.emit(LandingSideEffect.NavigateToTutorial)
         }
     }
 }

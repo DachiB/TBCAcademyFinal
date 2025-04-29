@@ -5,6 +5,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -32,6 +33,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
+import com.example.tbcacademyfinal.common.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import kotlinx.coroutines.delay
 
@@ -40,48 +42,53 @@ fun LandingScreen(
     viewModel: LandingViewModel = hiltViewModel(),
     onNavigateToTutorial: () -> Unit
 ) {
-    LandingScreenContent(
-        onProceedClicked = {
-            viewModel.onProceed() // Mark landing as seen
-            onNavigateToTutorial() // Trigger navigation via the lambda
+
+    CollectSideEffect(flow = viewModel.event) { effect ->
+        when (effect) {
+            is LandingSideEffect.NavigateToTutorial -> onNavigateToTutorial.invoke()
         }
+    }
+
+    LandingScreenContent(
+        onIntent = viewModel::processIntent,
     )
 }
 
 // Opt-in for AnimatedVisibility
 @Composable
 fun LandingScreenContent(
-    onProceedClicked: () -> Unit
+    onIntent: (LandingIntent) -> Unit = {},
 ) {
-    // State to control the visibility of animated content
     var contentVisible by remember { mutableStateOf(false) }
 
-    // Trigger the animation shortly after the composable enters the composition
     LaunchedEffect(Unit) {
-        delay(500) // Small delay before starting animation
+        delay(500)
         contentVisible = true
     }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(16.dp)
+            .background(color = MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween // Use SpaceBetween for alignment
+        verticalArrangement = Arrangement.SpaceBetween
     ) {
-        // Animated content grouping (Top part)
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.weight(1f) // Take available space
+            modifier = Modifier
+                .weight(1f)
                 .padding(top = 32.dp),
-            verticalArrangement = Arrangement.Center // Center content vertically within this Column
+            verticalArrangement = Arrangement.Center
         ) {
 
-            // App Logo / Graphic with animation
             AnimatedVisibility(
                 visible = contentVisible,
                 enter = fadeIn(animationSpec = tween(durationMillis = 1000)) + // Fade In
-                        slideInVertically(initialOffsetY = { -40 }, animationSpec = tween(durationMillis = 1000)), // Slide In from Top
+                        slideInVertically(
+                            initialOffsetY = { -40 },
+                            animationSpec = tween(durationMillis = 1000)
+                        ), // Slide In from Top
                 modifier = Modifier.padding(bottom = 24.dp) // Apply padding here if needed
             ) {
                 Image(
@@ -98,8 +105,16 @@ fun LandingScreenContent(
             // App Title with animation (delayed)
             AnimatedVisibility(
                 visible = contentVisible,
-                enter = fadeIn(animationSpec = tween(durationMillis = 1000, delayMillis = 200)) + // Delayed Fade
-                        slideInVertically(initialOffsetY = { -40 }, animationSpec = tween(durationMillis = 1000, delayMillis = 200)) // Delayed Slide
+                enter = fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 1000,
+                        delayMillis = 200
+                    )
+                ) + // Delayed Fade
+                        slideInVertically(
+                            initialOffsetY = { -40 },
+                            animationSpec = tween(durationMillis = 1000, delayMillis = 200)
+                        ) // Delayed Slide
             ) {
                 Text(
                     text = stringResource(id = R.string.app_name),
@@ -114,8 +129,16 @@ fun LandingScreenContent(
             // App Description with animation (further delayed)
             AnimatedVisibility(
                 visible = contentVisible,
-                enter = fadeIn(animationSpec = tween(durationMillis = 1000, delayMillis = 400)) + // More Delayed Fade
-                        slideInVertically(initialOffsetY = { -40 }, animationSpec = tween(durationMillis = 1000, delayMillis = 400)), // More Delayed Slide
+                enter = fadeIn(
+                    animationSpec = tween(
+                        durationMillis = 1000,
+                        delayMillis = 400
+                    )
+                ) + // More Delayed Fade
+                        slideInVertically(
+                            initialOffsetY = { -40 },
+                            animationSpec = tween(durationMillis = 1000, delayMillis = 400)
+                        ), // More Delayed Slide
                 modifier = Modifier.padding(horizontal = 16.dp) // Apply padding here
             ) {
                 Text(
@@ -130,15 +153,23 @@ fun LandingScreenContent(
         // Proceed Button - can also be animated or appear normally
         AnimatedVisibility(
             visible = contentVisible,
-            enter = fadeIn(animationSpec = tween(durationMillis = 1000, delayMillis = 600)) + // Even more Delayed Fade
-                    slideInVertically(initialOffsetY = { 40 }, animationSpec = tween(durationMillis = 1000, delayMillis = 600)), // Slide In from Bottom
+            enter = fadeIn(
+                animationSpec = tween(
+                    durationMillis = 1000,
+                    delayMillis = 600
+                )
+            ) +
+                    slideInVertically(
+                        initialOffsetY = { 40 },
+                        animationSpec = tween(durationMillis = 1000, delayMillis = 600)
+                    ),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp) // Padding applied here
-                .padding(bottom = 48.dp) // Ensure sufficient bottom padding
+                .padding(horizontal = 32.dp)
+                .padding(bottom = 48.dp)
         ) {
             Button(
-                onClick = onProceedClicked,
+                onClick = { onIntent(LandingIntent.PressedProceed) },
                 modifier = Modifier
                     .fillMaxWidth() // Button fills the width provided by modifier above
                     .height(50.dp),
@@ -158,6 +189,6 @@ fun LandingScreenContent(
 @Composable
 fun LandingScreenPreview() {
     TBCAcademyFinalTheme {
-        LandingScreenContent(onProceedClicked = {})
+        LandingScreenContent()
     }
 }

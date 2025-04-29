@@ -1,5 +1,8 @@
 package com.example.tbcacademyfinal.presentation.ui.auth.register
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.domain.usecase.auth.RegisterUserUseCase
@@ -7,6 +10,7 @@ import com.example.tbcacademyfinal.domain.usecase.validation.ValidateEmailUseCas
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordsMatchUseCase
 import com.example.tbcacademyfinal.common.Resource
+import com.example.tbcacademyfinal.common.errorOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -25,14 +29,10 @@ class RegisterViewModel @Inject constructor(
     private val validatePasswordsMatchUseCase: ValidatePasswordsMatchUseCase
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(RegisterState())
-    val state = _state.asStateFlow()
+    var state by mutableStateOf(RegisterState())
+        private set
 
-    private val _event = MutableSharedFlow<RegisterSideEffect>(
-        replay = 0,
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val _event = MutableSharedFlow<RegisterSideEffect>()
     val event = _event.asSharedFlow()
 
     // Function to process incoming intents from the UI
@@ -48,116 +48,91 @@ class RegisterViewModel @Inject constructor(
         }
     }
 
+
+
+    private fun validatePasswords(password: String, confirm: String): Pair<String?, String?> {
+        val passErr = validatePasswordUseCase(password).errorOrNull()
+        val confirmErr = validatePasswordsMatchUseCase(password, confirm).errorOrNull()
+        return passErr to confirmErr
+    }
+
     private fun updateEmail(email: String) {
-        val emailValidation = validateEmailUseCase(email)
-        val errorMessage = if (emailValidation is Resource.Error) emailValidation.message else null
-        _state.update { it.copy(email = email, emailError = errorMessage) }
+        val emailErr = validateEmailUseCase(email).errorOrNull()
+        state = state.copy(
+            email = email,
+            emailError = emailErr
+        )
     }
 
     private fun updatePassword(password: String) {
-        val passwordValidation = validatePasswordUseCase(password)
-        val confirmPasswordValidation =
-            validatePasswordsMatchUseCase(password, state.value.confirmPassword)
-        val passwordError =
-            if (passwordValidation is Resource.Error) passwordValidation.message else null
-        val confirmPasswordError =
-            if (confirmPasswordValidation is Resource.Error) confirmPasswordValidation.message else null
-        _state.update {
-            it.copy(
-                password = password,
-                passwordError = passwordError,
-                confirmPasswordError = confirmPasswordError
-            )
-        }
+        val (passErr, confirmErr) = validatePasswords(password, state.confirmPassword)
+        state = state.copy(
+            password = password,
+            passwordError = passErr,
+            confirmPasswordError = confirmErr
+        )
     }
 
     private fun updateConfirmPassword(confirmPassword: String) {
-        val passwordValidation = validatePasswordUseCase(state.value.password)
-        val confirmPasswordValidation =
-            validatePasswordsMatchUseCase(state.value.password, confirmPassword)
-        val passwordError =
-            if (passwordValidation is Resource.Error) passwordValidation.message else null
-        val confirmPasswordError =
-            if (confirmPasswordValidation is Resource.Error) confirmPasswordValidation.message else null
-        _state.update {
-            it.copy(
-                confirmPassword = confirmPassword,
-                passwordError = passwordError,
-                confirmPasswordError = confirmPasswordError,
-                )
-        }
+        val (passErr, confirmErr) = validatePasswords(state.password, confirmPassword)
+        state = state.copy(
+            confirmPassword = confirmPassword,
+            passwordError = passErr,
+            confirmPasswordError = confirmErr
+        )
     }
 
+
     private fun updatePasswordVisibility() {
-        _state.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+        state = state.copy(isPasswordVisible = !state.isPasswordVisible)
     }
 
     private fun updateConfirmPasswordVisibility() {
-        _state.update { it.copy(isConfirmPasswordVisible = !it.isConfirmPasswordVisible) }
+        state = state.copy(isConfirmPasswordVisible = !state.isConfirmPasswordVisible)
     }
 
     private fun performRegistration() {
-        if (state.value.isLoading) return
+        if (state.isLoading) return
 
-        val email = state.value.email.trim()
-        val password = state.value.password
-        val confirmPassword = state.value.confirmPassword
+        val email = state.email.trim()
+        val password = state.password
+        val confirmPassword = state.confirmPassword
 
-        // --- Run Validations ---
-        val emailValidation = validateEmailUseCase(email)
-        if (emailValidation is Resource.Error) {
-            _state.update { it.copy(serverErrorMessage = emailValidation.message) }
+        val firstError = validateEmailUseCase(email).errorOrNull()
+            ?: validatePasswordUseCase(password).errorOrNull()
+            ?: validatePasswordsMatchUseCase(password, confirmPassword).errorOrNull()
+
+        firstError?.let {
+            state = state.copy(serverErrorMessage = it)
             return
         }
 
-        val passwordValidation = validatePasswordUseCase(password)
-        if (passwordValidation is Resource.Error) {
-            _state.update { it.copy(serverErrorMessage = passwordValidation.message) }
-            return
-        }
-
-        val matchValidation = validatePasswordsMatchUseCase(password, confirmPassword)
-        if (matchValidation is Resource.Error) {
-            _state.update { it.copy(serverErrorMessage = matchValidation.message) }
-            return
-        }
-        // --- End Validations ---
-
-        // If validations passed, clear error and proceed
-        _state.update { it.copy(isLoading = true, serverErrorMessage = null) }
+        state = state.copy(serverErrorMessage = null)
 
         viewModelScope.launch {
             registerUserUseCase(email, password).collect { resource ->
-                when (resource) {
-                    is Resource.Loading -> _state.update { it.copy(isLoading = true) }
-                    is Resource.Success -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                isRegisterSuccess = true,
-                                serverErrorMessage = null
-                            )
-                        }
-                        _event.tryEmit(RegisterSideEffect.NavigateToMain)
-                    }
+                state = when (resource) {
+                    is Resource.Loading -> state.copy(isLoading = true)
+                    is Resource.Error -> state.copy(
+                        isLoading = false,
+                        serverErrorMessage = resource.message
+                    )
 
-                    is Resource.Error -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                serverErrorMessage = resource.message
-                            )
-                        }
-                        // Optionally emit event
-//                        _event.tryEmit(RegisterSideEffect.ShowError(resource.message))
-                    }
+                    is Resource.Success -> state.copy(
+                        isLoading = false,
+                        isRegisterSuccess = true,
+                        serverErrorMessage = null
+                    )
                 }
             }
         }
     }
 
+
     private fun navigateBack() {
-        _event.tryEmit(RegisterSideEffect.NavigateBackToLogin)
+        viewModelScope.launch {
+            _event.emit(RegisterSideEffect.NavigateBackToLogin)
+        }
     }
 
 }

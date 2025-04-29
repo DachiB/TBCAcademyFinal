@@ -7,9 +7,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.common.Resource
+import com.example.tbcacademyfinal.domain.usecase.collection.AddToCollectionUseCase
+import com.example.tbcacademyfinal.domain.usecase.collection.IsItemInCollectionUseCase
 import com.example.tbcacademyfinal.domain.usecase.network.ObserveNetworkStatusUseCase
 import com.example.tbcacademyfinal.domain.usecase.products.GetProductsUseCase
 import com.example.tbcacademyfinal.domain.util.ConnectivityObserver
+import com.example.tbcacademyfinal.presentation.mapper.toDomainModel
 import com.example.tbcacademyfinal.presentation.mapper.toUiModelList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
@@ -22,7 +25,9 @@ import javax.inject.Inject
 @HiltViewModel
 class StoreViewModel @Inject constructor(
     private val getProductsUseCase: GetProductsUseCase,
-    private val observeNetworkStatusUseCase: ObserveNetworkStatusUseCase
+    private val observeNetworkStatusUseCase: ObserveNetworkStatusUseCase,
+    private val addToCollectionUseCase: AddToCollectionUseCase,
+    private val isItemInCollectionUseCase: IsItemInCollectionUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(StoreState())
@@ -65,19 +70,48 @@ class StoreViewModel @Inject constructor(
                 state = state.copy(selectedCategory = null)
                 updateFilters()
             }
+
+            is StoreIntent.HasModelOnlyChanged -> {
+                state = state.copy(hasModelOnly = intent.hasModel)
+                updateFilters()
+            }
+
+            is StoreIntent.PriceRangeChanged -> {
+                state = state.copy(minPrice = intent.min, maxPrice = intent.max)
+                updateFilters()
+            }
+
+            is StoreIntent.FilterButtonClicked -> state =
+                state.copy(isFiltering = intent.isFiltering)
+
+            StoreIntent.ClickedAddDailyCollection -> addDailyCollection()
+            StoreIntent.ClickedAddItemOfDay -> addDailyItem()
         }
     }
 
     private fun updateFilters() {
         val query = state.searchQuery.trim()
         val category = state.selectedCategory
+        val hasModelOnly = state.hasModelOnly
+        val (min, max) = Pair(state.minPrice, state.maxPrice)
 
         val filtered = state.allProducts.filter { product ->
-            (query.isBlank() || product.name.contains(query, ignoreCase = true)) &&
-                    (category == null || product.category == category)
+            val matchesText = query.isBlank() || product.name.contains(query, ignoreCase = true)
+            val matchesCat = category == null || product.category == category
+            val matchesPrice = product.rawPrice.toFloat() in min..max
+            val matchesModel = !hasModelOnly || product.modelFile.isNotBlank()
+
+            matchesText && matchesCat && matchesPrice && matchesModel
         }
 
-        state = state.copy(currentProducts = filtered)
+        val filteringActive =
+            query.isNotBlank() ||
+                    category != null ||
+                    hasModelOnly ||
+                    min > 0f ||
+                    max < 10000f
+
+        state = state.copy(currentProducts = filtered, isFiltering = filteringActive)
     }
 
 
@@ -98,19 +132,37 @@ class StoreViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        val productList = resource.data.toUiModelList()
-                        val categoryList = productList
-                            .map { it.category }
-                            .filter { it.isNotBlank() }
-                            .distinct()
-                            .sorted()
+                        val list = resource.data.toUiModelList()
+
+                        val prices = list.map { it.rawPrice.toFloat() }
+                        val minP = prices.minOrNull() ?: 0f
+                        val maxP = prices.maxOrNull() ?: minP
+
+                        val daily = list.shuffled().take(7)
+                        val itemOfDay = list.randomOrNull()
+
+                        itemOfDay?.id?.let { id ->
+                            viewModelScope.launch {
+                                isItemInCollectionUseCase(id)
+                                    .collect { inCollection ->
+                                        state = state.copy(isDailyItemInCollection = inCollection)
+                                    }
+                            }
+                        }
 
                         state.copy(
                             isLoading = false,
                             error = null,
-                            allProducts = productList,
-                            currentProducts = productList,
-                            availableCategories = categoryList
+                            allProducts = list,
+                            currentProducts = list,
+                            availableCategories = list.map { it.category }
+                                .filter { it.isNotBlank() }
+                                .distinct()
+                                .sorted(),
+                            minPrice = minP,
+                            maxPrice = maxP,
+                            dailyCollection = daily,
+                            dailyItem = itemOfDay
                         )
                     }
                 }
@@ -152,5 +204,40 @@ class StoreViewModel @Inject constructor(
         }
     }
 
+    private fun addDailyCollection() = viewModelScope.launch {
+        val items = state.dailyCollection
+        var successCount = 0
 
+        items.forEach { ui ->
+            val domain = ui.toDomainModel()
+            val result = addToCollectionUseCase(domain)
+            if (result is Resource.Error) {
+                _event.emit(StoreSideEffect.ShowErrorSnackbar(result.message))
+            } else {
+                successCount++
+            }
+        }
+
+        if (successCount > 0) {
+            _event.emit(
+                StoreSideEffect.ShowErrorSnackbar(
+                    "$successCount item${if (successCount > 1) "s" else ""} added to collection"
+                )
+            )
+        }
+    }
+
+    private fun addDailyItem() {
+        viewModelScope.launch {
+            state.dailyItem?.let { product ->
+                val result = addToCollectionUseCase(product.toDomainModel())
+                if (result is Resource.Error) {
+                    _event.emit(StoreSideEffect.ShowErrorSnackbar(result.message))
+                } else {
+                    _event.emit(StoreSideEffect.ShowErrorSnackbar("Added to collection"))
+                }
+            }
+
+        }
+    }
 }

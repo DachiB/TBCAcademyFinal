@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -153,14 +154,16 @@ fun ArCollectionScreenContent(
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .padding(16.dp)
+
                 ) {
+//                    ExtendedFloatingActionButton(
+//                        onClick = { onIntent(CollectionIntent.StartDecorating) },
+//                        icon = { Icon(Icons.Filled.ShoppingCart, contentDescription = null) },
+//                        text = { Text(stringResource(R.string.buy_collection)) } // Add string
+//                    )
+//                    Spacer(modifier = Modifier.width(16.dp))
                     ExtendedFloatingActionButton(
-                        onClick = { onIntent(CollectionIntent.StartDecorating) },
-                        icon = { Icon(Icons.Filled.ShoppingCart, contentDescription = null) },
-                        text = { Text(stringResource(R.string.buy_collection)) } // Add string
-                    )
-                    Spacer(modifier = Modifier.width(16.dp))
-                    ExtendedFloatingActionButton(
+                        modifier = Modifier.weight(1f),
                         onClick = { onIntent(CollectionIntent.StartDecorating) },
                         icon = { Icon(Icons.Filled.Star, contentDescription = null) },
                         text = { Text(stringResource(R.string.collection_start_decorating)) } // Add string

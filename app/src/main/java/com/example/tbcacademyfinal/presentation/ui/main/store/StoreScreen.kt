@@ -1,15 +1,23 @@
 package com.example.tbcacademyfinal.presentation.ui.main.store
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -36,8 +44,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.common.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.model.ProductUi
+import com.example.tbcacademyfinal.presentation.theme.PlainWhite
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import com.example.tbcacademyfinal.presentation.ui.main.store.components.CategoryRow
+import com.example.tbcacademyfinal.presentation.ui.main.store.components.FilterRow
+import com.example.tbcacademyfinal.presentation.ui.main.store.components.HighlightsSection
 import com.example.tbcacademyfinal.presentation.ui.main.store.components.ProductGrid
 import com.example.tbcacademyfinal.presentation.ui.main.store.components.ProductItem
 
@@ -73,7 +84,7 @@ fun StoreScreen(
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                    titleContentColor = PlainWhite
                 )
             )
         }
@@ -90,7 +101,7 @@ fun StoreScreen(
 fun StoreScreenContent(
     modifier: Modifier = Modifier,
     state: StoreState,
-    onIntent: (StoreIntent) -> Unit // Receive lambda for query change
+    onIntent: (StoreIntent) -> Unit
 ) {
 
     if (state.isNetworkAvailable) {
@@ -109,9 +120,24 @@ fun StoreScreenContent(
         } else {
             Column(
                 modifier = modifier.padding(
-                    horizontal = 16.dp, vertical = 8.dp
+                    start = 16.dp, end = 16.dp, top = 16.dp
                 ),
             ) {
+                Spacer(modifier = Modifier.height(0.dp))
+                AnimatedVisibility(
+                    visible = !state.isFiltering && !state.isSearching,
+                    enter =
+                    fadeIn() + slideInVertically(),
+                    exit = fadeOut() + slideOutVertically()
+                ) {
+                    HighlightsSection(
+                        state = state,
+                        onIntent = onIntent,
+                    )
+                }
+
+
+                Spacer(modifier = Modifier.height(12.dp))
                 OutlinedTextField(
                     value = state.searchQuery,
                     modifier = Modifier.fillMaxWidth(),
@@ -125,13 +151,31 @@ fun StoreScreenContent(
                     },
                     trailingIcon = {
                         Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = R.string.search_string.toString()
+                            imageVector = Icons.Default.MoreVert,
+                            contentDescription = R.string.search_string.toString(),
+                            modifier = Modifier.clickable {
+                                onIntent(
+                                    StoreIntent.FilterButtonClicked(
+                                        state.isFiltering.not()
+                                    )
+                                )
+                            }
                         )
 
                     }
                 )
-                CategoryRow(state = state, onIntent = onIntent)
+                if (state.isFiltering) {
+                    FilterRow(
+                        state = state,
+                        onIntent = onIntent
+                    )
+                } else {
+                    CategoryRow(
+                        state = state,
+                        onIntent = onIntent
+                    )
+                }
+
                 if (state.isSearching) {
                     Box(
                         modifier = Modifier
@@ -206,35 +250,16 @@ fun StoreScreenContent(
             }
         }
     }
-
 }
 
-
-// Add placeholder drawable `ic_placeholder_image.xml` to `res/drawable`
-// Example vector placeholder:
-/*
-<vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="24dp"
-    android:height="24dp"
-    android:viewportWidth="24.0"
-    android:viewportHeight="24.0"
-    android:tint="?attr/colorControlNormal">
-  <path
-      android:fillColor="@android:color/darker_gray"
-      android:pathData="M21,19V5c0,-1.1 -0.9,-2 -2,-2H5c-1.1,0 -2,0.9 -2,2v14c0,1.1 0.9,2 2,2h14c1.1,0 2,-0.9 2,-2zM8.5,13.5l2.5,3.01L14.5,12l4.5,6H5l3.5,-4.5z"/>
-</vector>
-*/
-
-
-// --- Previews ---
 @Preview(showBackground = true)
 @Composable
 fun StoreScreenContentPreview() {
     TBCAcademyFinalTheme {
         val sampleProducts = listOf(
-            ProductUi("p1", "Modern Sofa", "Desc", "$1299.99", "", "Sofas", "m1"),
-            ProductUi("p2", "Minimalist Lamp", "Desc", "$149.50", "", "Lighting", "m2"),
-            ProductUi("p3", "Oak Coffee Table", "Desc", "$399.00", "", "Tables", "m3")
+            ProductUi("p1", "Modern Sofa", "Desc", 1299.99, "$1299.99", "", "", ""),
+            ProductUi("p2", "Minimalist Lamp", "Desc", 149.50, "$149.50", "", "", ""),
+            ProductUi("p3", "Oak Coffee Table", "Desc", 399.00, "$399.00", "", "", "")
         )
         StoreScreenContent(
             state = StoreState(
@@ -253,7 +278,7 @@ fun StoreScreenContentPreview() {
 fun ProductItemPreview() {
     TBCAcademyFinalTheme {
         ProductItem(
-            product = ProductUi("p1", "Modern Sofa", "Desc", "$1299.99", "", "Sofas", "m1"),
+            product = ProductUi("p1", "Modern Sofa", "Desc", 1299.99, "$1299.99", "", "", ""),
             onClick = {}
         )
     }

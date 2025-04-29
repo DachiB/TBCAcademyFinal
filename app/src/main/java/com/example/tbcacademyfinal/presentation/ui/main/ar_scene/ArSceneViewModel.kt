@@ -1,6 +1,9 @@
 package com.example.tbcacademyfinal.presentation.ui.main.ar_scene
 
 import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.domain.usecase.collection.GetCollectionItemsUseCase
@@ -8,25 +11,23 @@ import com.example.tbcacademyfinal.presentation.mapper.toUiModelList
 import com.example.tbcacademyfinal.presentation.model.CollectionItemUi
 import com.google.ar.core.TrackingFailureReason
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ArSceneViewModel @Inject constructor(
     private val getCollectionItemsUseCase: GetCollectionItemsUseCase
-    // Inject other use cases later if needed (e.g., analytics)
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(ArSceneState())
-    val state: StateFlow<ArSceneState> = _state.asStateFlow()
+    var state by mutableStateOf(ArSceneState())
+        private set
 
-    private val _event = MutableSharedFlow<ArSceneSideEffect>(
-        replay = 0,
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val _event = MutableSharedFlow<ArSceneSideEffect>()
     val event: SharedFlow<ArSceneSideEffect> = _event.asSharedFlow()
 
     init {
@@ -43,79 +44,68 @@ class ArSceneViewModel @Inject constructor(
         }
     }
 
-    // --- Public function to be called from ARScene callbacks ---
-    fun onTrackingFailureChanged(reason: TrackingFailureReason?) {
-        _state.update { it.copy(trackingFailureReason = reason) }
-        updateInstructionText() // Update text based on tracking
-    }
-
-    // --- Intent Processors ---
     private fun loadCollection() {
         viewModelScope.launch {
             getCollectionItemsUseCase()
                 .onStart {
-                    _state.update {
-                        it.copy(
+                    state =
+                        state.copy(
                             isLoadingCollection = true,
                             collectionError = null
                         )
-                    }
+
                 }
                 .catch { e ->
                     val errorMsg = e.localizedMessage ?: "Failed to load collection"
-                    _state.update {
-                        it.copy(
+                    state =
+                        state.copy(
                             isLoadingCollection = false,
                             collectionError = errorMsg
                         )
-                    }
-                    _event.tryEmit(ArSceneSideEffect.ShowError(errorMsg))
+
+                    _event.emit(ArSceneSideEffect.ShowError(errorMsg))
                 }
                 .collect { domainItems ->
-                    _state.update {
-                        it.copy(
+                    state =
+                        state.copy(
                             isLoadingCollection = false,
                             availableItems = domainItems.toUiModelList(),
                             collectionError = null
                         )
-                    }
                 }
         }
     }
 
     private fun selectItem(item: CollectionItemUi) {
         Log.d("ArScreen", "Selecting item: ${item.name}, Model: ${item.modelFile}")
-        _state.update { it.copy(selectedItemModelFile = item.modelFile) }
-        updateInstructionText() // Update text to prompt placement
+        state = state.copy(selectedItemModelFile = item.modelFile)
+        updateInstructionText()
     }
 
     private fun itemPlaced() {
-        // Item successfully placed, clear selection for next placement
-        _state.update { it.copy(selectedItemModelFile = null) }
-        updateInstructionText() // Update text to prompt selection or movement
+        state = state.copy(selectedItemModelFile = null)
+        updateInstructionText()
     }
 
     private fun clearSelection() {
-        _state.update { it.copy(selectedItemModelFile = null) }
-        updateInstructionText() // Update text
+        state = state.copy(selectedItemModelFile = null)
+        updateInstructionText()
     }
 
     private fun hidePlanes() {
-        _state.update { it.copy(showPlaneRenderer = false) }
+        state = state.copy(showPlaneRenderer = false)
     }
 
-
-    // --- Helper to update instruction text based on state ---
     private fun updateInstructionText() {
-        val currentState = _state.value // Get current state once
+        val currentState = state
         val text = when {
-            currentState.trackingFailureReason != null -> "Tracking Lost: ${currentState.trackingFailureReason}" // Consider using getDescription() here
+            currentState.trackingFailureReason != null -> "Tracking Lost: ${currentState.trackingFailureReason}"
             currentState.availableItems.isEmpty() && !currentState.isLoadingCollection -> "No items in collection"
             currentState.selectedItemModelFile != null -> "Tap a surface to place the item"
-            !currentState.showPlaneRenderer -> "Tap to place another item or move existing ones" // After first placement
-            else -> "Point phone down to find a surface" // Default initial state
+            !currentState.showPlaneRenderer -> "Tap to place another item or move existing ones"
+            else -> "Point phone down to find a surface"
         }
-        _state.update { it.copy(instructionText = text) }
+        state = state.copy(instructionText = text)
     }
 
 }

@@ -24,7 +24,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 
-@OptIn(ExperimentalMaterial3Api::class) // For Card onClick
 @Composable
 fun TutorialCard(
     text: String,

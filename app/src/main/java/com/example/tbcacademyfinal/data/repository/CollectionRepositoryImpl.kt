@@ -21,22 +21,19 @@ class CollectionRepositoryImpl @Inject constructor(
 ) : CollectionRepository {
 
     override fun getCollectionItems(): Flow<List<CollectionItem>> {
-        // Map the Flow<List<Entity>> to Flow<List<Domain>>
         return collectionDao.getCollectionItems().map { entityList ->
             entityList.toDomainList()
         }
-        // Note: Flows from Room run on a background thread by default usually
     }
 
     override fun isItemInCollection(productId: String): Flow<Boolean> {
-        // Map Flow<Int> (count) to Flow<Boolean>
         return collectionDao.isItemInCollection(productId).map { count ->
             count > 0
         }
     }
 
     override suspend fun addItemToCollection(product: Product): Resource<Unit> {
-        return withContext(Dispatchers.IO) { // Ensure DB operations are off the main thread
+        return withContext(Dispatchers.IO) {
             try {
                 collectionDao.insertItem(product.toCollectionEntity())
                 Resource.Success(Unit)

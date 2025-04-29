@@ -1,19 +1,19 @@
 package com.example.tbcacademyfinal.presentation.ui.auth.login
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.tbcacademyfinal.common.Resource
+import com.example.tbcacademyfinal.common.errorOrNull
 import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
 import com.example.tbcacademyfinal.domain.usecase.auth.LoginUserUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidateEmailUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordUseCase
-import com.example.tbcacademyfinal.common.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,14 +25,10 @@ class LoginViewModel @Inject constructor(
     private val dataStoreRepository: DataStoreRepository
 ) : ViewModel() {
 
-    private var _state = MutableStateFlow(LoginState())
-    val state = _state.asStateFlow()
+    var state by mutableStateOf(LoginState())
+        private set
 
-    private val _event = MutableSharedFlow<LoginSideEffect>(
-        replay = 0,
-        extraBufferCapacity = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
-    )
+    private val _event = MutableSharedFlow<LoginSideEffect>()
     val event = _event.asSharedFlow()
 
     // Function to process incoming intents from the UI
@@ -43,68 +39,59 @@ class LoginViewModel @Inject constructor(
             is LoginIntent.LoginClicked -> performLogin()
             is LoginIntent.RegisterLinkClicked -> navigateToRegister()
             is LoginIntent.PasswordVisibilityChanged -> updatePasswordVisibility()
-            is LoginIntent.RememberMeChanged -> _state.update { it.copy(rememberMe = intent.isChecked) }
+            is LoginIntent.RememberMeChanged -> state = state.copy(rememberMe = intent.isChecked)
         }
     }
 
+
     private fun updateEmail(email: String) {
-        _state.update { it.copy(email = email, errorMessage = null) }
+        state = state.copy(email = email, errorMessage = null)
     }
 
     private fun updatePassword(password: String) {
-        _state.update { it.copy(password = password, errorMessage = null) }
+        state = state.copy(password = password, errorMessage = null)
     }
 
     private fun updatePasswordVisibility() {
-        _state.update { it.copy(isPasswordVisible = !it.isPasswordVisible) }
+        state = state.copy(isPasswordVisible = !state.isPasswordVisible)
     }
 
     private fun performLogin() {
-        if (state.value.isLoading) return
+        if (state.isLoading) return
 
-        val email = state.value.email.trim() // Trim email here
-        val password = state.value.password // No need to trim password
+        val email = state.email.trim()
+        val password = state.password
 
-        // --- Run Validations ---
-        val emailValidation = validateEmailUseCase(email)
-        if (emailValidation is Resource.Error) {
-            _state.update { it.copy(errorMessage = emailValidation.message) }
-            return // Stop if validation fails
+        val firstError = validateEmailUseCase(email).errorOrNull()
+            ?: validatePasswordUseCase(password).errorOrNull()
+
+        firstError?.let {
+            state = state.copy(errorMessage = it)
+            return
         }
 
-        val passwordValidation = validatePasswordUseCase(password)
-        if (passwordValidation is Resource.Error) {
-            _state.update { it.copy(errorMessage = passwordValidation.message) }
-            return // Stop if validation fails
-        }
-        // --- End Validations ---
-        val rememberUserPref = state.value.rememberMe
-        // If validations passed, clear any previous error and proceed
-        _state.update { it.copy(isLoading = true, errorMessage = null) }
+        state = state.copy(errorMessage = null)
 
         viewModelScope.launch {
             loginUserUseCase(email, password).collect { resource ->
                 when (resource) {
-                    is Resource.Loading -> _state.update { it.copy(isLoading = true) } // Can keep updating loading just in case
+                    is Resource.Loading -> state =
+                        state.copy(isLoading = true) // Can keep updating loading just in case
                     is Resource.Success -> {
-                        dataStoreRepository.setShouldRememberUser(rememberUserPref)
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                isLoginSuccess = true,
-                                errorMessage = null
-                            )
-                        }
-                        _event.tryEmit(LoginSideEffect.NavigateToMain)
+                        dataStoreRepository.setShouldRememberUser(state.rememberMe)
+                        state = state.copy(
+                            isLoading = false,
+                            isLoginSuccess = true,
+                            errorMessage = null
+                        )
+                        _event.emit(LoginSideEffect.NavigateToMain)
                     }
 
                     is Resource.Error -> {
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                errorMessage = resource.message
-                            )
-                        }
+                        state = state.copy(
+                            isLoading = false,
+                            errorMessage = resource.message
+                        )
                     }
                 }
             }
@@ -112,6 +99,8 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun navigateToRegister() {
-        _event.tryEmit(LoginSideEffect.NavigateToRegister)
+        viewModelScope.launch {
+            _event.emit(LoginSideEffect.NavigateToRegister)
+        }
     }
 }

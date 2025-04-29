@@ -60,8 +60,6 @@ fun LoginScreen(
     onNavigateToMain: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
-
     // Side Effect collection remains the same
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
@@ -75,7 +73,7 @@ fun LoginScreen(
 
     // Pass the processIntent lambda down
     LoginScreenContent(
-        state = state, processIntent = viewModel::processIntent // Pass the intent processor
+        state = viewModel.state, processIntent = viewModel::processIntent // Pass the intent processor
     )
 }
 
@@ -325,7 +323,10 @@ fun LoginScreenContent(
                         color = MaterialTheme.colorScheme.primary,
                         textDecoration = TextDecoration.Underline
                     ),
-                    modifier = Modifier.clickable { processIntent(LoginIntent.RegisterLinkClicked) })
+
+                    modifier = Modifier.clickable {
+                        if (!state.isLoading) processIntent(LoginIntent.RegisterLinkClicked)
+                    })
             }
         }
     }

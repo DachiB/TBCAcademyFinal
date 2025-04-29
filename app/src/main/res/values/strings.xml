@@ -2,7 +2,7 @@
     <string name="app_name">AR Home Designer</string>
     <string name="hint_email">Enter Your Email</string>
     <string name="landing_image_description">AR Designer Image</string>
-    <string name="landing_description">Landing Description</string>
+    <string name="landing_description">Design, Plan, and Decorate Your Home With AR</string>
     <string name="landing_get_started">Get Started</string>
     <string name="hide_password">Hide Password</string>
     <string name="show_password">Show Password</string>
@@ -53,4 +53,10 @@
     <string name="no_such_product_s">No such product(s)</string>
     <string name="buy_collection">Buy Collection</string>
     <string name="view_model_in_3d">3D View</string>
+    <string name="finish_tutorial">Finish Tutorial</string>
+    <string name="view_details">View Details</string>
+    <string name="collection_of_day">Collection Of Day</string>
+    <string name="go_to_details">Go To Details</string>
+    <string name="in_collection">In Collection</string>
+    <string name="has_3d_model_only">Has 3D Model only</string>
 </resources>

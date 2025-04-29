@@ -14,6 +14,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.outlined.FavoriteBorder
+import androidx.compose.material.icons.twotone.Email
+import androidx.compose.material.icons.twotone.Lock
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -52,7 +54,6 @@ fun RegisterScreen(
     onRegisterSuccess: () -> Unit,
     onNavigateBackToLogin: () -> Unit
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
 
     // Side Effect collection remains the same
     CollectSideEffect(flow = viewModel.event) { effect ->
@@ -67,7 +68,7 @@ fun RegisterScreen(
 
     // Pass the processIntent lambda down
     RegisterScreenContent(
-        state = state,
+        state = viewModel.state,
         processIntent = viewModel::processIntent // Pass intent processor
     )
 }
@@ -126,6 +127,12 @@ fun RegisterScreenContent(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 isError = state.emailError != null,
                 enabled = !state.isLoading,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.TwoTone.Email,
+                        contentDescription = stringResource(R.string.email_label)
+                    )
+                },
                 supportingText = {
                     if (state.emailError != null) {
                         Text(
@@ -136,14 +143,18 @@ fun RegisterScreenContent(
                 }
             )
             Spacer(modifier = Modifier.height(16.dp))
-            // Password Field - Dispatch Intent
             OutlinedTextField(
                 value = state.password,
-                // Send PasswordChanged intent on value change
                 onValueChange = { processIntent(RegisterIntent.PasswordChanged(it)) },
                 label = { Text(stringResource(R.string.password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.TwoTone.Lock,
+                        contentDescription = stringResource(R.string.password_label)
+                    )
+                },
                 visualTransformation = if (state.isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
@@ -172,14 +183,18 @@ fun RegisterScreenContent(
             )
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Confirm Password Field - Dispatch Intent
             OutlinedTextField(
                 value = state.confirmPassword,
-                // Send ConfirmPasswordChanged intent on value change
                 onValueChange = { processIntent(RegisterIntent.ConfirmPasswordChanged(it)) },
                 label = { Text(stringResource(R.string.confirm_password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.TwoTone.Lock,
+                        contentDescription = stringResource(R.string.password_label)
+                    )
+                },
                 visualTransformation = if (state.isConfirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 trailingIcon = {
@@ -209,7 +224,6 @@ fun RegisterScreenContent(
                 }
             )
 
-            // Error message display remains the same
             val errorMessage = state.serverErrorMessage
             if (errorMessage != null) {
                 Text(
@@ -227,9 +241,7 @@ fun RegisterScreenContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Register Button - Dispatch Intent
             Button(
-                // Send RegisterClicked intent on click
                 onClick = { processIntent(RegisterIntent.RegisterClicked) },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -248,20 +260,21 @@ fun RegisterScreenContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Login Link - Dispatch Intent
             Text(
                 text = stringResource(R.string.login_prompt),
                 style = TextStyle(
                     color = MaterialTheme.colorScheme.primary,
                     textDecoration = TextDecoration.Underline
                 ),
-                modifier = Modifier.clickable { processIntent(RegisterIntent.NavigateBackClicked) }
+                modifier = Modifier.clickable {
+                    if (!state.isLoading)
+                        processIntent(RegisterIntent.NavigateBackClicked)
+                }
             )
         }
     }
 }
 
-// --- Previews remain the same, but update to use the new RegisterScreenContent signature ---
 @Preview(showBackground = true)
 @Composable
 fun RegisterScreenPreview() {
