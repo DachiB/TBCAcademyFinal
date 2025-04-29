@@ -1,49 +1,46 @@
 package com.example.tbcacademyfinal.presentation.ui.main.ar_scene
 
+import android.annotation.SuppressLint
+import android.content.Context
+import android.graphics.Bitmap
 import android.util.Log
+import android.view.PixelCopy
+import android.view.SurfaceView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil3.compose.AsyncImage
-import coil3.request.ImageRequest
-import coil3.request.crossfade
-import com.example.tbcacademyfinal.R
-import com.example.tbcacademyfinal.presentation.model.CollectionItemUi
+import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.presentation.ui.main.ar_scene.components.CollectionThumbnail
 import com.google.android.filament.Engine
 import com.google.ar.core.Anchor
 import com.google.ar.core.Config
@@ -67,28 +64,51 @@ import io.github.sceneview.rememberModelLoader
 import io.github.sceneview.rememberNodes
 import io.github.sceneview.rememberOnGestureListener
 import io.github.sceneview.rememberView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun ArSceneScreen(
     viewModel: ArSceneViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit
 ) {
-    ArScreenContent(
-        state = viewModel.state,
-        onNavigateBack = { onNavigateBack() }
-    )
+
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    CollectSideEffect(flow = viewModel.event) {
+        when (it) {
+            is ArSceneSideEffect.ShowSnackBar -> snackbarHostState.showSnackbar(
+                message = it.message,
+                actionLabel = "Dismiss",
+                withDismissAction = true
+            )
+
+            ArSceneSideEffect.NavigateBack -> onNavigateBack()
+        }
+    }
+    Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        }) { _ ->
+        ArScreenContent(
+            state = viewModel.state,
+            onIntent = viewModel::processIntent
+        )
+    }
 }
 
 
 @Composable
 fun ArScreenContent(
     state: ArSceneState,
-    onNavigateBack: () -> Unit
+    onIntent: (ArSceneIntent) -> Unit = {},
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
-
+        val context = LocalContext.current
+        val coroutineScope = rememberCoroutineScope()
         val engine = rememberEngine()
         val modelLoader = rememberModelLoader(engine)
         val materialLoader = rememberMaterialLoader(engine)
@@ -171,7 +191,7 @@ fun ArScreenContent(
 
 
         IconButton(
-            onClick = onNavigateBack,
+            onClick = { onIntent(ArSceneIntent.GoBackClicked) },
             modifier = Modifier
                 .align(Alignment.TopStart)
                 .systemBarsPadding()
@@ -252,42 +272,27 @@ fun ArScreenContent(
     }
 }
 
-@Composable
-fun CollectionThumbnail(
-    item: CollectionItemUi,
-    isSelected: Boolean,
-    onClick: () -> Unit
+fun captureArView(
+    view: SurfaceView,
+    context: Context,
+    coroutineScope: kotlinx.coroutines.CoroutineScope,
+    onBitmapReady: (Bitmap) -> Unit, // Callback for success
+    onError: (String) -> Unit // Callback for error
 ) {
-    Box(
-        modifier = Modifier
-            .size(80.dp) // Size of the thumbnail
-            .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.surfaceVariant)
-            .clickable(onClick = onClick)
-            .border( // Add border if selected
-                width = 3.dp,
-                color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                shape = CircleShape
-            )
-            .padding(4.dp), // Inner padding
-        contentAlignment = Alignment.Center
-    ) {
-        AsyncImage(
-            model = ImageRequest.Builder(LocalContext.current)
-                .data(item.imageUrl)
-                .crossfade(true)
-                .build(),
-            contentDescription = item.name,
-            contentScale = ContentScale.Crop,
-            placeholder = painterResource(R.drawable.ic_launcher_background),
-            error = painterResource(R.drawable.ic_launcher_background),
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(CircleShape)
-        )
-    }
+    val bitmap = Bitmap.createBitmap(view.width, view.height, Bitmap.Config.ARGB_8888)
+    PixelCopy.request(view, bitmap, { copyResult ->
+        if (copyResult == PixelCopy.SUCCESS) {
+            // Don't save here, pass bitmap back to ViewModel via callback
+            coroutineScope.launch(Dispatchers.Main) { // Ensure callback on main thread
+                onBitmapReady(bitmap)
+            }
+        } else {
+            coroutineScope.launch(Dispatchers.Main) {
+                onError("PixelCopy Error: $copyResult")
+            }
+        }
+    }, android.os.Handler(context.mainLooper))
 }
-
 
 fun createAnchorNode(
     engine: Engine,

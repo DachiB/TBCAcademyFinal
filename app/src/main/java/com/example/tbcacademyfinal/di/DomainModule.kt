@@ -30,8 +30,4 @@ object DomainModule {
     fun provideValidatePasswordsMatchUseCase(): ValidatePasswordsMatchUseCase {
         return ValidatePasswordsMatchUseCase()
     }
-
-
-
-    // Add other domain layer use case providers here later
 }

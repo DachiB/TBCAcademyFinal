@@ -8,14 +8,17 @@ import com.example.tbcacademyfinal.data.repository.AuthRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.CollectionRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.DataStoreRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.ProductRepositoryImpl
+import com.example.tbcacademyfinal.data.repository.StorageRepositoryImpl
 import com.example.tbcacademyfinal.data.repository.UserRepositoryImpl
 import com.example.tbcacademyfinal.domain.repository.AuthRepository
 import com.example.tbcacademyfinal.domain.repository.CollectionRepository
 import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
 import com.example.tbcacademyfinal.domain.repository.ProductRepository
+import com.example.tbcacademyfinal.domain.repository.StorageRepository
 import com.example.tbcacademyfinal.domain.repository.UserRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.storage.FirebaseStorage
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -57,6 +60,12 @@ object RepositoryModule {
     @Provides
     fun provideDataStoreRepository(dataStore: DataStore<Preferences>): DataStoreRepository {
         return DataStoreRepositoryImpl(dataStore)
+    }
+
+    @Provides
+    @Singleton
+    fun provideStorageRepository(storage: FirebaseStorage): StorageRepository {
+        return StorageRepositoryImpl(storage)
     }
 
 }

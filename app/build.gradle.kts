@@ -37,10 +37,18 @@ android {
 
     buildTypes {
         debug {
-            buildConfigField("String", "BASE_URL", "\"https://680bfccd2ea307e081d2e686.mockapi.io/api/\"")
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://680bfccd2ea307e081d2e686.mockapi.io/api/\""
+            )
         }
         release {
-            buildConfigField("String", "BASE_URL", "\"https://680bfccd2ea307e081d2e686.mockapi.io/api/\"")
+            buildConfigField(
+                "String",
+                "BASE_URL",
+                "\"https://680bfccd2ea307e081d2e686.mockapi.io/api/\""
+            )
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
@@ -114,6 +122,10 @@ dependencies {
     implementation("com.google.firebase:firebase-crashlytics")
     implementation("com.google.firebase:firebase-analytics")
     implementation("io.github.sceneview:arsceneview:2.3.0")
+    implementation("com.google.firebase:firebase-storage-ktx")
+    implementation("androidx.work:work-runtime-ktx:2.10.1")
+    implementation("androidx.hilt:hilt-work:1.2.0")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
     implementation(libs.ar.core)
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.auth.ktx)

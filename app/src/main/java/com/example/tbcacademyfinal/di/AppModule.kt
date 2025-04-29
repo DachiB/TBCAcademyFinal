@@ -2,6 +2,7 @@ package com.example.tbcacademyfinal.di
 
 
 import android.content.Context
+import androidx.work.WorkManager
 import com.example.tbcacademyfinal.MyApplication
 import dagger.Module
 import dagger.Provides
@@ -19,5 +20,10 @@ object AppModule {
     fun provideApplication(@ApplicationContext app: Context): MyApplication {
         return app as MyApplication
     }
-    // Provide other app-level singletons if needed
+
+    @Provides
+    @Singleton
+    fun provideWorkManager(@ApplicationContext context: Context) =
+        WorkManager.getInstance(context)
+
 }

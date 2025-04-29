@@ -25,14 +25,12 @@ object DatabaseModule {
             AppDatabase::class.java,
             DATABASE_NAME
         )
-            // Add migrations here if needed in the future:
-            // .addMigrations(MIGRATION_1_2)
-            .fallbackToDestructiveMigration(false) // Simple fallback for now during development
+            .fallbackToDestructiveMigration(false)
             .build()
     }
 
     @Provides
-    @Singleton // DAOs are usually singletons within the DB scope
+    @Singleton
     fun provideCollectionDao(appDatabase: AppDatabase): CollectionDao {
         return appDatabase.collectionDao()
     }

@@ -1,27 +1,48 @@
 package com.example.tbcacademyfinal.presentation.ui.main.ar_scene
 
+import android.content.Context
+import android.graphics.Bitmap
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.Constraints
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
+import androidx.work.workDataOf
+import com.example.tbcacademyfinal.common.PhotoUploadWorker
 import com.example.tbcacademyfinal.domain.usecase.collection.GetCollectionItemsUseCase
 import com.example.tbcacademyfinal.presentation.mapper.toUiModelList
 import com.example.tbcacademyfinal.presentation.model.CollectionItemUi
-import com.google.ar.core.TrackingFailureReason
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.io.File
+import java.io.FileOutputStream
+import java.io.IOException
+import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class ArSceneViewModel @Inject constructor(
-    private val getCollectionItemsUseCase: GetCollectionItemsUseCase
+    private val getCollectionItemsUseCase: GetCollectionItemsUseCase,
+    private val workManager: WorkManager, // Inject WorkManager
+    private val firebaseAuth: FirebaseAuth, // Inject FirebaseAuth for user ID
+    @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
     var state by mutableStateOf(ArSceneState())
@@ -41,7 +62,25 @@ class ArSceneViewModel @Inject constructor(
             is ArSceneIntent.ItemPlaced -> itemPlaced()
             is ArSceneIntent.ClearSelection -> clearSelection()
             is ArSceneIntent.HidePlanes -> hidePlanes()
+            is ArSceneIntent.DiscardPhotoClicked -> discardPhoto()
+            is ArSceneIntent.PhotoCaptured -> showPhotoPreview(intent.bitmap)
+            is ArSceneIntent.TakePhotoButtonClicked -> {
+                viewModelScope.launch {
+                    _event.emit(ArSceneSideEffect.ShowSnackBar("ViewModel notified: Take photo initiated by UI"))
+                }
+            }
+
+            is ArSceneIntent.UploadPhotoClicked -> uploadPhoto()
+            ArSceneIntent.GoBackClicked -> navigateBack()
         }
+    }
+
+    private fun showPhotoPreview(bitmap: Bitmap) {
+        state = state.copy(isPreviewingPhoto = true, capturedBitmap = bitmap)
+    }
+
+    private fun discardPhoto() {
+        state = state.copy(isPreviewingPhoto = false, capturedBitmap = null)
     }
 
     private fun loadCollection() {
@@ -63,7 +102,7 @@ class ArSceneViewModel @Inject constructor(
                             collectionError = errorMsg
                         )
 
-                    _event.emit(ArSceneSideEffect.ShowError(errorMsg))
+                    _event.emit(ArSceneSideEffect.ShowSnackBar(errorMsg))
                 }
                 .collect { domainItems ->
                     state =
@@ -106,6 +145,126 @@ class ArSceneViewModel @Inject constructor(
             else -> "Point phone down to find a surface"
         }
         state = state.copy(instructionText = text)
+    }
+
+    private fun uploadPhoto() {
+        val bitmapToUpload = state.capturedBitmap ?: return // Should not be null here
+        val currentUser = firebaseAuth.currentUser ?: return // Need user to be logged in
+
+        state = state.copy(
+            isPreviewingPhoto = false,
+            capturedBitmap = null,
+            isUploading = true
+        )
+
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            val cacheUri = saveBitmapToCache(appContext, bitmapToUpload)
+            _event.emit(ArSceneSideEffect.ShowSnackBar("Uploading Photo"))
+            if (cacheUri == null) {
+                withContext(Dispatchers.Main) {
+                    state = state.copy(isUploading = false)  // Clear indicator
+                    _event.emit(ArSceneSideEffect.ShowSnackBar("Error saving photo for upload."))
+                }
+                return@launch
+            }
+
+            // Define where to upload in Firebase Storage (e.g., user_photos/userId/filename.jpg)
+            val filename = "ARDesign_${UUID.randomUUID()}.jpg"
+            val uploadPath = "user_photos/${currentUser.uid}/$filename"
+
+            // Create WorkManager Input Data
+            val inputData = workDataOf(
+                PhotoUploadWorker.KEY_FILE_URI to cacheUri.toString(),
+                PhotoUploadWorker.KEY_UPLOAD_PATH to uploadPath
+            )
+
+            // Create Work Request
+            val uploadWorkRequest = OneTimeWorkRequestBuilder<PhotoUploadWorker>()
+                .setInputData(inputData)
+                .setConstraints(
+                    Constraints(
+                        requiredNetworkType = NetworkType.CONNECTED
+                    )
+                )
+                .addTag("photo_upload") // Optional tag for tracking/cancelling
+                .build()
+
+            // Enqueue Work
+            workManager.enqueueUniqueWork(
+                "upload_$filename",
+                ExistingWorkPolicy.KEEP,
+                uploadWorkRequest
+            )
+
+            observeUploadWork(uploadWorkRequest.id)
+
+        }
+    }
+
+    private fun observeUploadWork(workId: UUID) {
+        workManager.getWorkInfoByIdLiveData(workId).observeForever { workInfo ->
+            when (workInfo?.state) {
+                WorkInfo.State.SUCCEEDED -> {
+                    val downloadUrl =
+                        workInfo.outputData.getString(PhotoUploadWorker.KEY_RESULT_URL)
+                    showMessage("Upload successful: $downloadUrl")
+                    state = state.copy(isUploading = false)
+                }
+
+                WorkInfo.State.FAILED -> {
+                    val errorMsg = workInfo.outputData.getString(PhotoUploadWorker.KEY_RESULT_ERROR)
+                    showMessage("Upload failed: $errorMsg")
+                    state = state.copy(isUploading = false)
+                    // Clean up observer?
+                }
+
+                WorkInfo.State.CANCELLED -> {
+                    showMessage("Upload cancelled")
+                    state = state.copy(isUploading = false)
+                }
+
+                WorkInfo.State.RUNNING -> {
+                    state = state.copy(isUploading = true)
+                }
+
+                else -> {}
+            }
+        }
+    }
+
+    private fun saveBitmapToCache(context: Context, bitmap: Bitmap): Uri? {
+        val cachePath = File(context.cacheDir, "image_cache")
+        cachePath.mkdirs() // Create cache sub-directory if needed
+        val fileName = "upload_temp_${System.currentTimeMillis()}.jpg"
+        val file = File(cachePath, fileName)
+        return try {
+            FileOutputStream(file).use { fos ->
+                bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos)
+            }
+            Uri.fromFile(file) // Return file URI (Worker needs permission if using Content Uri)
+            // Alternative: Use FileProvider for Content URI if needed
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+    }
+
+    private fun showMessage(message: String) {
+        viewModelScope.launch {
+            _event.emit(ArSceneSideEffect.ShowSnackBar(message))
+        }
+    }
+
+    private fun navigateBack() {
+        viewModelScope.launch {
+            _event.emit(ArSceneSideEffect.NavigateBack)
+        }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
     }
 
 }
