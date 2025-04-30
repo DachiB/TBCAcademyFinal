@@ -5,10 +5,10 @@ import javax.inject.Inject
 
 class ValidatePasswordsMatchUseCase @Inject constructor() {
 
-    operator fun invoke(password: String, confirmPassword: String): Resource<Unit> { // Return Resource<Unit>
+    operator fun invoke(password: String, confirmPassword: String): Resource<Unit> {
         if (password != confirmPassword) {
-            return Resource.Error("Passwords do not match.") // TODO: Use string resources
+            return Resource.Error("Passwords do not match.")
         }
-        return Resource.Success(Unit) // Success returns Unit
+        return Resource.Success(Unit)
     }
 }

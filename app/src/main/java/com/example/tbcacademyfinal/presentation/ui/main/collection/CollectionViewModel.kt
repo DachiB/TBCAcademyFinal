@@ -42,7 +42,7 @@ class CollectionViewModel @Inject constructor(
 
     fun processIntent(intent: CollectionIntent) {
         when (intent) {
-            is CollectionIntent.LoadCollection -> loadCollectionItems() // Allow refresh
+            is CollectionIntent.LoadCollection -> loadCollectionItems()
             is CollectionIntent.RemoveItem -> removeItem(intent.productId)
             is CollectionIntent.ClearCollection -> clearAllItems()
             is CollectionIntent.StartDecorating -> startAr()
@@ -72,7 +72,6 @@ class CollectionViewModel @Inject constructor(
     private fun removeItem(productId: String) {
         viewModelScope.launch {
             val result = removeFromCollectionUseCase(productId)
-            // State list will update automatically via the flow from getCollectionItemsUseCase
             if (result is Resource.Error) {
                 viewModelScope.launch {
                     _event.emit(CollectionSideEffect.ShowError(result.message))
@@ -84,7 +83,6 @@ class CollectionViewModel @Inject constructor(
     private fun clearAllItems() {
         viewModelScope.launch {
             val result = clearCollectionUseCase()
-            // State list will update automatically via the flow
             if (result is Resource.Error) {
                 viewModelScope.launch {
                     _event.emit(CollectionSideEffect.ShowError(result.message))

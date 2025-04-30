@@ -1,5 +1,6 @@
 package com.example.tbcacademyfinal.presentation.ui.main.collection
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -38,9 +39,9 @@ import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.model.CollectionItemUi
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 fun CollectionScreen(
-    // Needed to navigate away to AR screen
     viewModel: CollectionViewModel = hiltViewModel(),
     onNavigateToArScreen: () -> Unit
 ) {

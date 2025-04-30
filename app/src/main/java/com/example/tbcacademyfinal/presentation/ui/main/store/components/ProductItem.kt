@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.tbcacademyfinal.presentation.model.ProductUi
 import com.example.tbcacademyfinal.common.ImageLoader
+import com.example.tbcacademyfinal.presentation.model.ProductUi
 
 @Composable
 fun ProductItem(
@@ -52,7 +52,7 @@ fun ProductItem(
                 Text(
                     text = product.formattedPrice,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary // Highlight price maybe
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }

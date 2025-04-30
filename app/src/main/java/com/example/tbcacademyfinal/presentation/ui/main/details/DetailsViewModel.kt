@@ -25,8 +25,8 @@ import javax.inject.Inject
 @HiltViewModel
 class DetailsViewModel @Inject constructor(
     private val getProductDetailsUseCase: GetProductDetailsUseCase,
-    private val addToCollectionUseCase: AddToCollectionUseCase, // Inject Add UC
-    private val isItemInCollectionUseCase: IsItemInCollectionUseCase, // Inject Check UC
+    private val addToCollectionUseCase: AddToCollectionUseCase,
+    private val isItemInCollectionUseCase: IsItemInCollectionUseCase,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -78,7 +78,16 @@ class DetailsViewModel @Inject constructor(
     }
 
     private fun navigateToModelScreen(productId: String) {
+        val currentDomainProduct = state.product
         viewModelScope.launch {
+            if (currentDomainProduct == null) {
+                _event.emit(DetailsSideEffect.ShowError("Product data not loaded yet."))
+                return@launch
+            }
+            if (currentDomainProduct.modelFile.isBlank()) {
+                _event.emit(DetailsSideEffect.ShowError("Product has no model file."))
+                return@launch
+            }
             _event.emit(DetailsSideEffect.NavigateToModel(productId))
         }
     }
@@ -86,7 +95,7 @@ class DetailsViewModel @Inject constructor(
     private fun observeCollectionStatus() {
         viewModelScope.launch {
             isItemInCollectionUseCase(productId)
-                .distinctUntilChanged() // Only react to actual changes
+                .distinctUntilChanged()
                 .collect { isInCollection ->
                     state = state.copy(isAddedToCollection = isInCollection)
                 }
@@ -108,7 +117,6 @@ class DetailsViewModel @Inject constructor(
                 addToCollectionUseCase(currentDomainProduct.toDomainModel())
             when (result) {
                 is Resource.Success -> {
-                    // State will update automatically via observeCollectionStatus
                     _event.emit(DetailsSideEffect.ShowAddedToCollectionMessage)
                 }
 

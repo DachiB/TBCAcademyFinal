@@ -19,7 +19,7 @@ fun ProductGrid(
     onProductClick: (productId: String) -> Unit
 ) {
     LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 160.dp), // Adjust minSize as needed
+        columns = GridCells.Adaptive(minSize = 160.dp),
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 12.dp),
@@ -33,24 +33,5 @@ fun ProductGrid(
                 modifier = Modifier.animateItemPlacement()
             )
         }
-
-
-//        if (state.isLoading && state.products.isNotEmpty()) {
-//            item {
-//                Box(
-//                    modifier = Modifier
-//                        .fillMaxWidth()
-//                        .padding(16.dp),
-//                    contentAlignment = Alignment.Center
-//                ) {
-//                    LinearProgressIndicator(
-//                        modifier = Modifier
-//                            .width(72.dp)
-//                            .align(Alignment.Center),
-//                        color = MaterialTheme.colorScheme.primary
-//                    )
-//                }
-//            }
-//        }
     }
 }

@@ -44,7 +44,7 @@ fun TutorialCard(
                 .fillMaxSize()
                 .background(
                     color = cardColor
-                ), // Fill the card
+                ),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -72,7 +72,7 @@ fun TutorialPromptScreenPreview() {
         TutorialCard(
             text = "Start Tutorial",
             icon = androidx.compose.material.icons.Icons.Default.PlayArrow,
-            onClick = { /* Handle click */ },
+            onClick = {  },
             cardColor = MaterialTheme.colorScheme.background
         )
 

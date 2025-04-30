@@ -71,9 +71,9 @@ fun ModelContent(
                     Text(
                         state.product?.name ?: stringResource(R.string.details_title)
                     )
-                }, // Show product name or default
+                },
                 navigationIcon = {
-                    IconButton(onClick = { onIntent(ModelIntent.ClickedBack) }) { // Use direct navigation
+                    IconButton(onClick = { onIntent(ModelIntent.ClickedBack) }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.navigate_back)

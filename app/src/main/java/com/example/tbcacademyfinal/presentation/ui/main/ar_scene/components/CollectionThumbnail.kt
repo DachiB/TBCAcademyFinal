@@ -32,16 +32,16 @@ fun CollectionThumbnail(
 ) {
     Box(
         modifier = Modifier
-            .size(80.dp) // Size of the thumbnail
+            .size(80.dp)
             .clip(CircleShape)
             .background(MaterialTheme.colorScheme.surfaceVariant)
             .clickable(onClick = onClick)
-            .border( // Add border if selected
+            .border(
                 width = 3.dp,
                 color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                 shape = CircleShape
             )
-            .padding(4.dp), // Inner padding
+            .padding(4.dp),
         contentAlignment = Alignment.Center
     ) {
         AsyncImage(

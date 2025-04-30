@@ -42,21 +42,20 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
-import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import com.example.tbcacademyfinal.common.ImageLoader
+import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.model.ProductUi
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 
 
 @Composable
 fun DetailsScreen(
-    // Product ID is implicitly retrieved by the ViewModel via SavedStateHandle
-    // Needed for back navigation
+
     viewModel: DetailsViewModel = hiltViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToModelScene: (productId: String) -> Unit
 ) {
-    val snackbarHostState = remember { SnackbarHostState() } // For showing messages
+    val snackbarHostState = remember { SnackbarHostState() }
 
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
@@ -107,9 +106,9 @@ fun DetailsScreenContent(
                     Text(
                         state.product?.name ?: stringResource(R.string.details_title)
                     )
-                }, // Show product name or default
+                },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) { // Use direct navigation
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.navigate_back)
@@ -117,7 +116,7 @@ fun DetailsScreenContent(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface, // Or background
+                    containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSurface
                 )
@@ -130,11 +129,9 @@ fun DetailsScreenContent(
                 .padding(paddingValues)
         ) {
             when {
-                // Initial Loading State
                 state.isLoading && state.product == null -> {
                     CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
                 }
-                // Error State
                 state.error != null -> {
                     Text(
                         text = "Error: ${state.error}",
@@ -143,9 +140,7 @@ fun DetailsScreenContent(
                             .align(Alignment.Center)
                             .padding(16.dp)
                     )
-                    // TODO: Add retry mechanism?
                 }
-                // Success State
                 state.product != null -> {
                     ProductDetails(
                         product = state.product,
@@ -159,7 +154,6 @@ fun DetailsScreenContent(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductDetails(
     product: ProductUi,
@@ -171,20 +165,19 @@ fun ProductDetails(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .verticalScroll(rememberScrollState()) // Make content scrollable
+            .verticalScroll(rememberScrollState())
             .padding(16.dp)
     ) {
-        // Product Image
         ImageLoader.LoadImage(
             imageUrl = product.imageUrl,
             modifier = Modifier
                 .fillMaxWidth()
-                .aspectRatio(1f) // Adjust aspect ratio for details view
+                .aspectRatio(1f)
                 .padding(bottom = 16.dp)
                 .shadow(
                     elevation = 8.dp,
                     shape = RoundedCornerShape(12.dp),
-                    clip = false // we’ll clip separately
+                    clip = false
                 )
                 .clip(MaterialTheme.shapes.large),
             localContext = LocalContext.current
@@ -215,7 +208,7 @@ fun ProductDetails(
             modifier = Modifier.padding(bottom = 24.dp)
         )
 
-        Spacer(modifier = Modifier.weight(1f)) // Push button towards bottom
+        Spacer(modifier = Modifier.weight(1f))
 
         Button(
             onClick = onViewModelClicked,
@@ -236,12 +229,12 @@ fun ProductDetails(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = 16.dp),
-            enabled = !isAddedToCollection // Disable if already added
+            enabled = !isAddedToCollection
         ) {
             val icon =
-                if (isAddedToCollection) Icons.Filled.Check else Icons.Filled.ShoppingCart // Use appropriate icons
+                if (isAddedToCollection) Icons.Filled.Check else Icons.Filled.ShoppingCart
             val textResId =
-                if (isAddedToCollection) R.string.details_added_to_collection else R.string.details_add_to_collection // Add strings
+                if (isAddedToCollection) R.string.details_added_to_collection else R.string.details_add_to_collection
 
             Icon(
                 imageVector = icon,

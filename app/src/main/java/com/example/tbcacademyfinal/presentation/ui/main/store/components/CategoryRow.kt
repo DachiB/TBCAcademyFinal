@@ -39,7 +39,7 @@ fun CategoryRow(state: StoreState, onIntent: (StoreIntent) -> Unit) {
                             Icons.Filled.Done,
                             contentDescription = stringResource(R.string.selected_option)
                         )
-                    } // Add string resource
+                    }
                 } else {
                     null
                 }

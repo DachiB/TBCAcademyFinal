@@ -11,13 +11,10 @@ import com.example.tbcacademyfinal.common.Resource
 import com.example.tbcacademyfinal.domain.usecase.products.GetProductDetailsUseCase
 import com.example.tbcacademyfinal.presentation.mapper.toUiModel
 import com.example.tbcacademyfinal.presentation.navigation.Routes
-import com.example.tbcacademyfinal.presentation.ui.main.details.DetailsIntent
-import com.example.tbcacademyfinal.presentation.ui.main.details.DetailsSideEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

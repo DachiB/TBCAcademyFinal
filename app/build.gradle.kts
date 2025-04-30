@@ -140,6 +140,8 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    testImplementation("org.jetbrains.kotlin:kotlin-test:1.8.22")
+    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:1.8.21")
     testImplementation("io.mockk:mockk:1.13.2")
     androidTestImplementation(libs.androidx.espresso.core)
 }

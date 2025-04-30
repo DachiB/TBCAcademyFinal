@@ -148,8 +148,8 @@ class ArSceneViewModel @Inject constructor(
     }
 
     private fun uploadPhoto() {
-        val bitmapToUpload = state.capturedBitmap ?: return // Should not be null here
-        val currentUser = firebaseAuth.currentUser ?: return // Need user to be logged in
+        val bitmapToUpload = state.capturedBitmap ?: return
+        val currentUser = firebaseAuth.currentUser ?: return
 
         state = state.copy(
             isPreviewingPhoto = false,

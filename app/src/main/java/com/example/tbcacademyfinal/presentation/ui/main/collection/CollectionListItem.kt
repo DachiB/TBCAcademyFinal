@@ -60,7 +60,7 @@ fun CollectionListItem(
         Text(
             text = item.name,
             style = MaterialTheme.typography.bodyLarge,
-            modifier = Modifier.weight(1f), // Take remaining space
+            modifier = Modifier.weight(1f),
             maxLines = 2,
             overflow = TextOverflow.Ellipsis
         )
@@ -71,7 +71,7 @@ fun CollectionListItem(
                     R.string.collection_remove_item,
                     item.name
                 ), // Add string
-                tint = MaterialTheme.colorScheme.error // Indicate deletion action
+                tint = MaterialTheme.colorScheme.error
             )
         }
     }

@@ -56,7 +56,6 @@ fun CollectionOfDayCard(
 
                 Spacer(Modifier.height(4.dp))
 
-                // Row of up to 3 thumbnails
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

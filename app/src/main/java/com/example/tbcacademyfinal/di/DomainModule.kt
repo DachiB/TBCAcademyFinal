@@ -10,11 +10,11 @@ import dagger.hilt.android.components.ViewModelComponent // Scope to ViewModel l
 import dagger.hilt.android.scopes.ViewModelScoped // Use ViewModelScoped
 
 @Module
-@InstallIn(ViewModelComponent::class) // Use cases often scoped to ViewModel
+@InstallIn(ViewModelComponent::class)
 object DomainModule {
 
     @Provides
-    @ViewModelScoped // Scope the use case to the ViewModel
+    @ViewModelScoped
     fun provideValidateEmailUseCase(): ValidateEmailUseCase {
         return ValidateEmailUseCase()
     }

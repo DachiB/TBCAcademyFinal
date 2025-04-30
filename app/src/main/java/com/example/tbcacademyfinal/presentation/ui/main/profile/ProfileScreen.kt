@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -101,6 +102,7 @@ fun ProfileScreenContent(
             .fillMaxSize()
             .padding(16.dp),
     ) {
+        Spacer(modifier = Modifier.height(16.dp))
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -139,7 +141,32 @@ fun ProfileScreenContent(
             )
             Spacer(modifier = Modifier.weight(1f))
         } else {
+            Spacer(modifier = Modifier.height(16.dp))
 
+            Text(
+                text = "Email: ${state.userEmail ?: "Unknown User"}",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .fillMaxWidth(),
+                textAlign = TextAlign.Center
+            )
+
+            Button(
+                onClick = { processIntent(ProfileIntent.LogoutClicked) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                    contentDescription = null,
+                    modifier = Modifier.size(ButtonDefaults.IconSize)
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                Text(stringResource(R.string.profile_logout_button))
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
             when {
                 state.isLoadingPhotos -> {
                     CircularProgressIndicator(modifier = Modifier.padding(vertical = 16.dp))
@@ -180,27 +207,7 @@ fun ProfileScreenContent(
                     }
                     Spacer(modifier = Modifier.weight(1f))
 
-                    Text(
-                        text = "Email: ${state.userEmail ?: "Unknown User"}",
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .fillMaxWidth(),
-                        textAlign = TextAlign.Center
-                    )
-                    Button(
-                        onClick = { processIntent(ProfileIntent.LogoutClicked) },
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                            contentDescription = null,
-                            modifier = Modifier.size(ButtonDefaults.IconSize)
-                        )
-                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                        Text(stringResource(R.string.profile_logout_button))
-                    }
+
                 }
             }
         }

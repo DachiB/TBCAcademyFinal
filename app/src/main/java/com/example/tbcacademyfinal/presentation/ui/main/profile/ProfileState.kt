@@ -1,7 +1,5 @@
 package com.example.tbcacademyfinal.presentation.ui.main.profile
 
-import android.net.Uri
-
 
 data class ProfileState(
     val userEmail: String? = null,

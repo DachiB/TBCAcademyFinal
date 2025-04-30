@@ -15,7 +15,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object DatabaseModule {
 
-    private const val DATABASE_NAME = "ar_home_designer.db" // Consistent naming
+    private const val DATABASE_NAME = "ar_home_designer.db"
 
     @Provides
     @Singleton

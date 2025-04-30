@@ -7,8 +7,8 @@ import kotlinx.coroutines.flow.Flow
 
 interface CollectionRepository {
     fun getCollectionItems(): Flow<List<CollectionItem>>
-    fun isItemInCollection(productId: String): Flow<Boolean> // Simplified observable check
-    suspend fun addItemToCollection(product: Product): Resource<Unit> // Use Resource for potential errors
+    fun isItemInCollection(productId: String): Flow<Boolean>
+    suspend fun addItemToCollection(product: Product): Resource<Unit>
     suspend fun removeItemFromCollection(productId: String): Resource<Unit>
     suspend fun clearCollection(): Resource<Unit>
 }
