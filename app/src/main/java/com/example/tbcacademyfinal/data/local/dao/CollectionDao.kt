@@ -28,5 +28,4 @@ interface CollectionDao {
     @Query("DELETE FROM collection_items")
     suspend fun clearCollection()
 
-    // You might add other queries later if needed
 }

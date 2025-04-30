@@ -5,25 +5,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tbcacademyfinal.domain.usecase.user.GetUserUseCase
-import com.example.tbcacademyfinal.domain.usecase.user.LogOutUseCase
 import com.example.tbcacademyfinal.common.Resource
 import com.example.tbcacademyfinal.domain.usecase.language.GetLanguageUseCase
 import com.example.tbcacademyfinal.domain.usecase.language.SaveLanguageUseCase
 import com.example.tbcacademyfinal.domain.usecase.theme.GetThemeUseCase
 import com.example.tbcacademyfinal.domain.usecase.theme.SaveThemeUseCase
+import com.example.tbcacademyfinal.domain.usecase.user.DeletePhotoUseCase
+import com.example.tbcacademyfinal.domain.usecase.user.GetUserPhotosUseCase
+import com.example.tbcacademyfinal.domain.usecase.user.GetUserUseCase
+import com.example.tbcacademyfinal.domain.usecase.user.LogOutUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.util.Locale
 import javax.inject.Inject
 
 
@@ -34,7 +28,9 @@ class ProfileViewModel @Inject constructor(
     private val getThemeUseCase: GetThemeUseCase,
     private val saveThemeUseCase: SaveThemeUseCase,
     private val getLanguageUseCase: GetLanguageUseCase,
-    private val saveLanguageUseCase: SaveLanguageUseCase
+    private val saveLanguageUseCase: SaveLanguageUseCase,
+    private val getUserPhotosUseCase: GetUserPhotosUseCase,
+    private val deletePhotoUseCase: DeletePhotoUseCase
 ) : ViewModel() {
 
     var state by mutableStateOf(ProfileState())
@@ -55,15 +51,13 @@ class ProfileViewModel @Inject constructor(
             is ProfileIntent.LogoutClicked -> performLogout()
             is ProfileIntent.LanguageChanged -> setLanguage(intent.language)
             is ProfileIntent.ThemeChanged -> toggleTheme(intent.theme)
+            is ProfileIntent.DeletePhotoClicked -> deletePhoto(intent.photoUrl)
         }
     }
 
     private fun loadData() {
-        // Start loading state (already default, but explicit for clarity)
-        // _state.update { it.copy(isLoading = true) } // Not strictly needed if initial state is loading=true
 
         viewModelScope.launch {
-            // Call the use case which returns Flow<Resource<User>>
             getUserUseCase().collect { resource ->
                 when (resource) {
                     is Resource.Loading -> {
@@ -71,7 +65,6 @@ class ProfileViewModel @Inject constructor(
                     }
 
                     is Resource.Success -> {
-                        // Get User object from success resource
                         val user = resource.data
                         state = state.copy(
                             isLoading = false,
@@ -80,13 +73,34 @@ class ProfileViewModel @Inject constructor(
                         )
 
                     }
-
                     is Resource.Error -> {
                         state = state.copy(
                             isLoading = false,
                             error = resource.message // Set error message from resource
                         )
 
+                    }
+                }
+            }
+            getUserPhotosUseCase().collect { photos ->
+                when (photos) {
+                    is Resource.Loading -> {
+                        state = state.copy(isLoadingPhotos = true, photosError = null)
+
+                    }
+
+                    is Resource.Success -> {
+                        state = state.copy(
+                            photos = photos.data,
+                            isLoadingPhotos = false,
+                        )
+                    }
+
+                    is Resource.Error -> {
+                        state = state.copy(
+                            isLoadingPhotos = false,
+                            photosError = photos.message
+                        )
                     }
                 }
             }
@@ -100,6 +114,24 @@ class ProfileViewModel @Inject constructor(
         }
     }
 
+    private fun deletePhoto(photoUrl: String) {
+        viewModelScope.launch {
+            when (val result = deletePhotoUseCase(photoUrl)) {
+                is Resource.Success -> {
+                    state =
+                        state.copy(photos = state.photos.filterNot { it == photoUrl })
+                    _event.emit(ProfileSideEffect.ShowMessage("Photo deleted successfully")) // TODO: String resource
+                }
+
+                is Resource.Error -> {
+                    _event.emit(ProfileSideEffect.ShowMessage("Error deleting photo: ${result.message}")) // TODO: String resource
+                }
+
+                is Resource.Loading -> {}
+            }
+        }
+    }
+
 
     private fun toggleTheme(current: Boolean) {
         viewModelScope.launch {
@@ -110,8 +142,8 @@ class ProfileViewModel @Inject constructor(
 
     private fun setLanguage(language: String) {
         viewModelScope.launch {
-            saveLanguageUseCase(language)
             state = state.copy(currentLanguage = language)
+            saveLanguageUseCase(language)
         }
     }
 

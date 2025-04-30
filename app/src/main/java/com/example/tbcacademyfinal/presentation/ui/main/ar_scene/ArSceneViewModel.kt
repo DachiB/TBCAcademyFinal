@@ -40,8 +40,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ArSceneViewModel @Inject constructor(
     private val getCollectionItemsUseCase: GetCollectionItemsUseCase,
-    private val workManager: WorkManager, // Inject WorkManager
-    private val firebaseAuth: FirebaseAuth, // Inject FirebaseAuth for user ID
+    private val workManager: WorkManager,
+    private val firebaseAuth: FirebaseAuth,
     @ApplicationContext private val appContext: Context
 ) : ViewModel() {
 
@@ -159,7 +159,6 @@ class ArSceneViewModel @Inject constructor(
 
 
         viewModelScope.launch(Dispatchers.IO) {
-
             val cacheUri = saveBitmapToCache(appContext, bitmapToUpload)
             _event.emit(ArSceneSideEffect.ShowSnackBar("Uploading Photo"))
             if (cacheUri == null) {
@@ -170,17 +169,14 @@ class ArSceneViewModel @Inject constructor(
                 return@launch
             }
 
-            // Define where to upload in Firebase Storage (e.g., user_photos/userId/filename.jpg)
             val filename = "ARDesign_${UUID.randomUUID()}.jpg"
             val uploadPath = "user_photos/${currentUser.uid}/$filename"
 
-            // Create WorkManager Input Data
             val inputData = workDataOf(
                 PhotoUploadWorker.KEY_FILE_URI to cacheUri.toString(),
                 PhotoUploadWorker.KEY_UPLOAD_PATH to uploadPath
             )
 
-            // Create Work Request
             val uploadWorkRequest = OneTimeWorkRequestBuilder<PhotoUploadWorker>()
                 .setInputData(inputData)
                 .setConstraints(
@@ -188,10 +184,9 @@ class ArSceneViewModel @Inject constructor(
                         requiredNetworkType = NetworkType.CONNECTED
                     )
                 )
-                .addTag("photo_upload") // Optional tag for tracking/cancelling
+                .addTag("photo_upload")
                 .build()
 
-            // Enqueue Work
             workManager.enqueueUniqueWork(
                 "upload_$filename",
                 ExistingWorkPolicy.KEEP,
@@ -236,15 +231,14 @@ class ArSceneViewModel @Inject constructor(
 
     private fun saveBitmapToCache(context: Context, bitmap: Bitmap): Uri? {
         val cachePath = File(context.cacheDir, "image_cache")
-        cachePath.mkdirs() // Create cache sub-directory if needed
+        cachePath.mkdirs()
         val fileName = "upload_temp_${System.currentTimeMillis()}.jpg"
         val file = File(cachePath, fileName)
         return try {
             FileOutputStream(file).use { fos ->
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 90, fos)
             }
-            Uri.fromFile(file) // Return file URI (Worker needs permission if using Content Uri)
-            // Alternative: Use FileProvider for Content URI if needed
+            Uri.fromFile(file)
         } catch (e: IOException) {
             e.printStackTrace()
             null

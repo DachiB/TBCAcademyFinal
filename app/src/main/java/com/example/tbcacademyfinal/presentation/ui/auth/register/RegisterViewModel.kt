@@ -10,14 +10,10 @@ import com.example.tbcacademyfinal.domain.usecase.validation.ValidateEmailUseCas
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordsMatchUseCase
 import com.example.tbcacademyfinal.common.Resource
-import com.example.tbcacademyfinal.common.errorOrNull
+import com.example.tbcacademyfinal.common.safecalls.errorOrNull
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -35,7 +31,6 @@ class RegisterViewModel @Inject constructor(
     private val _event = MutableSharedFlow<RegisterSideEffect>()
     val event = _event.asSharedFlow()
 
-    // Function to process incoming intents from the UI
     fun processIntent(intent: RegisterIntent) {
         when (intent) {
             is RegisterIntent.EmailChanged -> updateEmail(intent.email)
@@ -47,7 +42,6 @@ class RegisterViewModel @Inject constructor(
             is RegisterIntent.PasswordVisibilityChanged -> updatePasswordVisibility()
         }
     }
-
 
 
     private fun validatePasswords(password: String, confirm: String): Pair<String?, String?> {
@@ -118,11 +112,15 @@ class RegisterViewModel @Inject constructor(
                         serverErrorMessage = resource.message
                     )
 
-                    is Resource.Success -> state.copy(
-                        isLoading = false,
-                        isRegisterSuccess = true,
-                        serverErrorMessage = null
-                    )
+                    is Resource.Success -> {
+                        _event.emit(RegisterSideEffect.NavigateToMain)
+                        state.copy(
+                            isLoading = false,
+                            isRegisterSuccess = true,
+                            serverErrorMessage = null
+                        )
+                    }
+
                 }
             }
         }

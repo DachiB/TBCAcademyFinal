@@ -2,6 +2,7 @@ package com.example.tbcacademyfinal.data.repository
 
 import com.example.tbcacademyfinal.domain.repository.AuthRepository
 import com.example.tbcacademyfinal.common.Resource
+import com.example.tbcacademyfinal.common.safecalls.safeAuthCall
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException
@@ -19,53 +20,23 @@ class AuthRepositoryImpl @Inject constructor(
     private val auth: FirebaseAuth
 ) : AuthRepository {
 
-    // Example of listening to auth state:
-    // override val authState: Flow<FirebaseUser?> = callbackFlow {
-    //     val listener = FirebaseAuth.AuthStateListener { firebaseAuth ->
-    //         trySend(firebaseAuth.currentUser).isSuccess
-    //     }
-    //     auth.addAuthStateListener(listener)
-    //     awaitClose { auth.removeAuthStateListener(listener) }
-    // }.flowOn(Dispatchers.IO)
-
-    override suspend fun login(email: String, password: String): Flow<Resource<AuthResult>> = flow {
-        emit(Resource.Loading)
-        try {
-            val result = auth.signInWithEmailAndPassword(email, password).await()
-            emit(Resource.Success(result))
-        } catch (e: FirebaseAuthInvalidCredentialsException) {
-            emit(Resource.Error("Invalid email or password."))
-        } catch (e: Exception) {
-            emit(
-                Resource.Error(
-                    e.localizedMessage ?: "An unexpected error occurred during login.",
-                    e
-                )
-            )
-        }
-    }.flowOn(Dispatchers.IO) // Perform network/auth operations on IO dispatcher
-
-    override suspend fun register(email: String, password: String): Flow<Resource<AuthResult>> =
+    override fun login(email: String, password: String): Flow<Resource<AuthResult>> =
         flow {
             emit(Resource.Loading)
-            try {
-                val result = auth.createUserWithEmailAndPassword(email, password).await()
-                emit(Resource.Success(result))
-            } catch (e: FirebaseAuthWeakPasswordException) {
-                emit(Resource.Error("Password is too weak. Please choose a stronger password."))
-            } catch (e: FirebaseAuthInvalidCredentialsException) {
-                // Although less likely for registration, handle it just in case (e.g., malformed email)
-                emit(Resource.Error("Invalid email format."))
-            } catch (e: FirebaseAuthUserCollisionException) {
-                emit(Resource.Error("An account with this email already exists."))
-            } catch (e: Exception) {
-                emit(
-                    Resource.Error(
-                        e.localizedMessage ?: "An unexpected error occurred during registration.", e
-                    )
-                )
+            val res = safeAuthCall {
+                auth.signInWithEmailAndPassword(email, password).await()
             }
-        }.flowOn(Dispatchers.IO) // Perform network/auth operations on IO dispatcher
+            emit(res)
+        }.flowOn(Dispatchers.IO)
+
+    override fun register(email: String, password: String): Flow<Resource<AuthResult>> =
+        flow {
+            emit(Resource.Loading)
+            val res = safeAuthCall {
+                auth.createUserWithEmailAndPassword(email, password).await()
+            }
+            emit(res)
+        }.flowOn(Dispatchers.IO)
 
     override suspend fun logout() {
         auth.signOut()

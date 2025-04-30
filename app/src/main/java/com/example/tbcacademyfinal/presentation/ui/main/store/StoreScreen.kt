@@ -42,7 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
-import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.model.ProductUi
 import com.example.tbcacademyfinal.presentation.theme.PlainWhite
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme

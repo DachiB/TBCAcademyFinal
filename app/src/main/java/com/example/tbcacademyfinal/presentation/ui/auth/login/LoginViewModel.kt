@@ -6,9 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.tbcacademyfinal.common.Resource
-import com.example.tbcacademyfinal.common.errorOrNull
-import com.example.tbcacademyfinal.domain.repository.DataStoreRepository
+import com.example.tbcacademyfinal.common.safecalls.errorOrNull
 import com.example.tbcacademyfinal.domain.usecase.auth.LoginUserUseCase
+import com.example.tbcacademyfinal.domain.usecase.user.RememberUserUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidateEmailUseCase
 import com.example.tbcacademyfinal.domain.usecase.validation.ValidatePasswordUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -22,7 +22,7 @@ class LoginViewModel @Inject constructor(
     private val loginUserUseCase: LoginUserUseCase,
     private val validateEmailUseCase: ValidateEmailUseCase,
     private val validatePasswordUseCase: ValidatePasswordUseCase,
-    private val dataStoreRepository: DataStoreRepository
+    private val rememberUserUseCase: RememberUserUseCase,
 ) : ViewModel() {
 
     var state by mutableStateOf(LoginState())
@@ -31,7 +31,6 @@ class LoginViewModel @Inject constructor(
     private val _event = MutableSharedFlow<LoginSideEffect>()
     val event = _event.asSharedFlow()
 
-    // Function to process incoming intents from the UI
     fun processIntent(intent: LoginIntent) {
         when (intent) {
             is LoginIntent.EmailChanged -> updateEmail(intent.email)
@@ -76,9 +75,10 @@ class LoginViewModel @Inject constructor(
             loginUserUseCase(email, password).collect { resource ->
                 when (resource) {
                     is Resource.Loading -> state =
-                        state.copy(isLoading = true) // Can keep updating loading just in case
+                        state.copy(isLoading = true)
+
                     is Resource.Success -> {
-                        dataStoreRepository.setShouldRememberUser(state.rememberMe)
+                        rememberUserUseCase(state.rememberMe)
                         state = state.copy(
                             isLoading = false,
                             isLoginSuccess = true,

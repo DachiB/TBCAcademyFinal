@@ -14,6 +14,6 @@ class ValidateEmailUseCase @Inject constructor() {
         if (!Patterns.EMAIL_ADDRESS.matcher(trimmedEmail).matches()) {
             return Resource.Error("Please enter a valid email address.")
         }
-        return Resource.Success(Unit) // Success returns Unit
+        return Resource.Success(Unit)
     }
 }

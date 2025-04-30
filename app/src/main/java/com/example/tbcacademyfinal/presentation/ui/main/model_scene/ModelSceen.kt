@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
-import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import io.github.sceneview.Scene
 import io.github.sceneview.animation.Transition.animateRotation
 import io.github.sceneview.math.Position

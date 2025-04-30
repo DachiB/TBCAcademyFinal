@@ -3,14 +3,18 @@ package com.example.tbcacademyfinal.presentation.ui.main.profile
 import android.annotation.SuppressLint
 import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ExitToApp
 import androidx.compose.material3.Button
@@ -20,10 +24,13 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,10 +39,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
-import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
-import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.LanguageToggleButton
-import com.example.tbcacademyfinal.presentation.ui.main.profile.settings.ThemeSwitcher
+import com.example.tbcacademyfinal.presentation.ui.main.profile.components.LanguageToggleButton
+import com.example.tbcacademyfinal.presentation.ui.main.profile.components.PhotoItem
+import com.example.tbcacademyfinal.presentation.ui.main.profile.components.ThemeSwitcher
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -45,14 +53,22 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = hiltViewModel(),
     onLogout: () -> Unit,
 ) {
+    val snackbarHostState = remember { SnackbarHostState() }
 
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
             is ProfileSideEffect.NavigateToLogin -> onLogout()
+            is ProfileSideEffect.ShowMessage -> {
+                snackbarHostState.showSnackbar(
+                    effect.message,
+                    withDismissAction = true
+                )
+            }
         }
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = {
@@ -119,41 +135,78 @@ fun ProfileScreenContent(
                 text = "Error: ${state.error}",
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(bottom = 16.dp) // Add padding below error
+                modifier = Modifier.padding(bottom = 16.dp)
             )
-            Spacer(modifier = Modifier.weight(1f)) // Push logout to bottom
-        } else {
-            // Display User Email (Main Content)
-
             Spacer(modifier = Modifier.weight(1f))
+        } else {
 
-            Text(
-                text = "Email: ${state.userEmail}",
-                style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .fillMaxWidth(),
-                textAlign = TextAlign.Center
-            )
-            Button(
-                onClick = { processIntent(ProfileIntent.LogoutClicked) },
-                modifier = Modifier.fillMaxWidth(),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-            ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ExitToApp,
-                    contentDescription = null,
-                    modifier = Modifier.size(ButtonDefaults.IconSize)
-                )
-                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-                Text(stringResource(R.string.profile_logout_button))
+            when {
+                state.isLoadingPhotos -> {
+                    CircularProgressIndicator(modifier = Modifier.padding(vertical = 16.dp))
+                }
+
+                state.photosError != null -> {
+                    Text(
+                        text = "Error loading photos: ${state.photosError}",
+                        color = MaterialTheme.colorScheme.error,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
+
+                state.photos.isEmpty() -> {
+                    Text(
+                        text = stringResource(R.string.profile_photos_empty),
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(vertical = 16.dp)
+                    )
+                }
+
+                else -> {
+                    LazyVerticalGrid(
+                        columns = GridCells.Adaptive(minSize = 100.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(max = 300.dp),
+                        contentPadding = PaddingValues(vertical = 8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        items(state.photos, key = { url -> url }) { photoUrl ->
+                            PhotoItem(imageUrl = photoUrl.toString(), onDeleteClick = {
+                                processIntent(ProfileIntent.DeletePhotoClicked(photoUrl.toString()))
+                            })
+                        }
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Text(
+                        text = "Email: ${state.userEmail ?: "Unknown User"}",
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .fillMaxWidth(),
+                        textAlign = TextAlign.Center
+                    )
+                    Button(
+                        onClick = { processIntent(ProfileIntent.LogoutClicked) },
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ExitToApp,
+                            contentDescription = null,
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
+                        )
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+                        Text(stringResource(R.string.profile_logout_button))
+                    }
+                }
             }
         }
     }
 }
 
-
-// --- Previews (Update to reflect simplified state) ---
 @Preview(showBackground = true, name = "Profile Screen Light")
 @Composable
 fun ProfileScreenPreviewLight() {
@@ -162,7 +215,7 @@ fun ProfileScreenPreviewLight() {
             state = ProfileState(
                 userEmail = "test@example.com",
                 isLoading = false
-            ), // Simplified state
+            ),
             processIntent = {},
         )
     }
@@ -173,7 +226,7 @@ fun ProfileScreenPreviewLight() {
 fun ProfileScreenPreviewLoading() {
     TBCAcademyFinalTheme {
         ProfileScreenContent(
-            state = ProfileState(isLoading = true), // Simplified state
+            state = ProfileState(isLoading = true),
             processIntent = {},
         )
     }
@@ -187,7 +240,7 @@ fun ProfileScreenPreviewError() {
             state = ProfileState(
                 isLoading = false,
                 error = "Failed to load profile"
-            ), // Simplified state
+            ),
             processIntent = {},
         )
     }

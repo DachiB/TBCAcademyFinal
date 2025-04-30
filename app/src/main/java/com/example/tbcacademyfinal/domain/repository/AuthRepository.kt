@@ -6,14 +6,8 @@ import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.Flow
 
 interface AuthRepository {
-    // Optional: Function to get current user state if needed elsewhere
-    // fun getCurrentUser(): FirebaseUser?
-
-    // Listen to auth state changes (useful for automatic login/logout updates)
-    // val authState: Flow<FirebaseUser?>
-
-    suspend fun login(email: String, password: String): Flow<Resource<AuthResult>>
-    suspend fun register(email: String, password: String): Flow<Resource<AuthResult>>
+    fun login(email: String, password: String): Flow<Resource<AuthResult>>
+    fun register(email: String, password: String): Flow<Resource<AuthResult>>
     suspend fun getCurrentUser(): FirebaseUser?
     suspend fun logout()
 }

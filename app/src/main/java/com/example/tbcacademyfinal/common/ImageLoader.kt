@@ -36,7 +36,7 @@ object ImageLoader {
             error = painterResource(R.drawable.ic_launcher_background),
             modifier = modifier,
             contentScale = ContentScale.Crop,
-            clipToBounds = true// Fit the whole image
+            clipToBounds = true
         )
     }
 

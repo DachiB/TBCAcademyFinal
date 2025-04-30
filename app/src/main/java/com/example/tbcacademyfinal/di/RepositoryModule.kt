@@ -39,7 +39,7 @@ object RepositoryModule {
 
 
     @Provides
-    @Singleton // Or @ViewModelScoped
+    @Singleton
     fun provideAuthRepository(auth: FirebaseAuth): AuthRepository {
         return AuthRepositoryImpl(auth)
     }

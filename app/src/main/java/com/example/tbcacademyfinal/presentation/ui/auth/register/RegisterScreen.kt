@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.twotone.Email
 import androidx.compose.material.icons.twotone.Lock
 import androidx.compose.material3.Button
@@ -28,7 +26,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -42,10 +39,9 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
-import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 
 
 @Composable
@@ -55,21 +51,19 @@ fun RegisterScreen(
     onNavigateBackToLogin: () -> Unit
 ) {
 
-    // Side Effect collection remains the same
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
             is RegisterSideEffect.NavigateBackToLogin -> onNavigateBackToLogin()
             is RegisterSideEffect.NavigateToMain -> onRegisterSuccess()
             is RegisterSideEffect.ShowError -> {
-                println("Error: ${effect.message}") // Handle error display
+                println("Error: ${effect.message}")
             }
         }
     }
 
-    // Pass the processIntent lambda down
     RegisterScreenContent(
         state = viewModel.state,
-        processIntent = viewModel::processIntent // Pass intent processor
+        processIntent = viewModel::processIntent
     )
 }
 
@@ -116,10 +110,8 @@ fun RegisterScreenContent(
                 modifier = Modifier.padding(bottom = 32.dp)
             )
 
-            // Email Field - Dispatch Intent
             OutlinedTextField(
                 value = state.email,
-                // Send EmailChanged intent on value change
                 onValueChange = { processIntent(RegisterIntent.EmailChanged(it)) },
                 label = { Text(stringResource(R.string.email_label)) },
                 modifier = Modifier.fillMaxWidth(),
@@ -279,7 +271,7 @@ fun RegisterScreenContent(
 @Composable
 fun RegisterScreenPreview() {
     TBCAcademyFinalTheme {
-        RegisterScreenContent(state = RegisterState(), processIntent = {}) // Pass dummy lambda
+        RegisterScreenContent(state = RegisterState(), processIntent = {})
     }
 }
 

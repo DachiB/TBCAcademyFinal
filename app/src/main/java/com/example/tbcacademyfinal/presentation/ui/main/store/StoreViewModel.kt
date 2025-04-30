@@ -11,7 +11,7 @@ import com.example.tbcacademyfinal.domain.usecase.collection.AddToCollectionUseC
 import com.example.tbcacademyfinal.domain.usecase.collection.IsItemInCollectionUseCase
 import com.example.tbcacademyfinal.domain.usecase.network.ObserveNetworkStatusUseCase
 import com.example.tbcacademyfinal.domain.usecase.products.GetProductsUseCase
-import com.example.tbcacademyfinal.domain.util.ConnectivityObserver
+import com.example.tbcacademyfinal.domain.repository.ConnectivityObserver
 import com.example.tbcacademyfinal.presentation.mapper.toDomainModel
 import com.example.tbcacademyfinal.presentation.mapper.toUiModelList
 import dagger.hilt.android.lifecycle.HiltViewModel

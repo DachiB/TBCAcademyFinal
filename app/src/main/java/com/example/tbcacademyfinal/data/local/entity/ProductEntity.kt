@@ -5,7 +5,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.tbcacademyfinal.domain.model.Product
 
-// data/local/ProductEntity.kt
 @Entity(tableName = "products")
 data class ProductEntity(
     @PrimaryKey val id: String,
@@ -17,21 +16,4 @@ data class ProductEntity(
     @ColumnInfo(name = "model_file") val modelFile: String
 )
 
-fun Product.toEntity() = ProductEntity(
-    id = id,
-    name = name,
-    description = description,
-    price = price,
-    imageUrl = imageUrl,
-    category = category,
-    modelFile = modelFile
-)
 
-fun ProductEntity.toDomain() = Product(
-    id = id,
-    name = name, description = description,
-    price = price,
-    imageUrl = imageUrl,
-    category = category,
-    modelFile = modelFile
-)

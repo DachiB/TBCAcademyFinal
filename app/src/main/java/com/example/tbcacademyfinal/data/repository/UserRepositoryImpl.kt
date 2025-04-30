@@ -23,10 +23,10 @@ class UserRepositoryImpl @Inject constructor(
         emit(Resource.Loading)
         try {
             firestore.collection(USERS_COLLECTION)
-                .document(user.uid) // Use Firebase Auth UID as document ID
-                .set(user) // Store the User data class (Firestore handles serialization)
+                .document(user.uid)
+                .set(user)
                 .await()
-            emit(Resource.Success(Unit)) // Success means void operation completed
+            emit(Resource.Success(Unit))
         } catch (e: Exception) {
             emit(
                 Resource.Error(
@@ -46,7 +46,7 @@ class UserRepositoryImpl @Inject constructor(
                 .await()
 
             val user =
-                documentSnapshot.toObject(User::class.java) // Deserialize back to User data class
+                documentSnapshot.toObject(User::class.java)
             if (user != null) {
                 emit(Resource.Success(user))
             } else {

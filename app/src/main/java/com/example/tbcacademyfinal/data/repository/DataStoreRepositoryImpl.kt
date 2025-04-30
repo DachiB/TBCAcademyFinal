@@ -24,7 +24,6 @@ class DataStoreRepositoryImpl @Inject constructor(
                 preferences[PreferencesKeys.SEEN_LANDING] = hasSeen
             }
         } catch (e: IOException) {
-            // Handle error, e.g., log it
             println("Error saving landing preference: ${e.localizedMessage}")
         }
     }
@@ -32,7 +31,6 @@ class DataStoreRepositoryImpl @Inject constructor(
     override fun hasSeenLanding(): Flow<Boolean> {
         return dataStore.data
             .catch { exception ->
-                // IOException means Preferences couldn't be read, emit empty
                 if (exception is IOException) {
                     println("Error reading landing preference: ${exception.localizedMessage}")
                     emit(emptyPreferences())
@@ -41,7 +39,6 @@ class DataStoreRepositoryImpl @Inject constructor(
                 }
             }
             .map { preferences ->
-                // Default to false if the key doesn't exist
                 preferences[PreferencesKeys.SEEN_LANDING] ?: false
             }
     }
@@ -49,13 +46,13 @@ class DataStoreRepositoryImpl @Inject constructor(
     override suspend fun setShouldRememberUser(remember: Boolean) {
         try {
             dataStore.edit { prefs -> prefs[PreferencesKeys.SHOULD_REMEMBER_USER] = remember }
-        } catch (e: IOException) { /* Handle error */
+        } catch (e: IOException) { //TO-DO:
         }
     }
 
     override fun shouldRememberUser(): Flow<Boolean> {
         return dataStore.data.map { prefs ->
-            prefs[PreferencesKeys.SHOULD_REMEMBER_USER] ?: false // Default to false
+            prefs[PreferencesKeys.SHOULD_REMEMBER_USER] ?: false
         }
     }
 
@@ -77,8 +74,8 @@ class DataStoreRepositoryImpl @Inject constructor(
 
     override fun getAppLanguage(): Flow<String> {
         return dataStore.data
-        .map { preferences ->
-            preferences[LANGUAGE_KEY] ?: "en"
-        }
+            .map { preferences ->
+                preferences[LANGUAGE_KEY] ?: "en"
+            }
     }
 }

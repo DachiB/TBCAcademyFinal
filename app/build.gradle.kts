@@ -35,6 +35,12 @@ android {
         kotlinCompilerExtensionVersion = "1.5.15"
     }
 
+    testOptions {
+        unitTests {
+            isIncludeAndroidResources = true
+        }
+    }
+
     buildTypes {
         debug {
             buildConfigField(
@@ -63,7 +69,7 @@ android {
         jvmTarget = "17"
     }
 
-    packaging { // KEEP THIS BLOCK
+    packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
@@ -71,7 +77,6 @@ android {
         jniLibs.pickFirsts.add("lib/**/libarcore_sdk_java.so")
     }
 
-    //NO Compress?
 }
 
 dependencies {
@@ -135,6 +140,7 @@ dependencies {
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
+    testImplementation("io.mockk:mockk:1.13.2")
     androidTestImplementation(libs.androidx.espresso.core)
 }
 

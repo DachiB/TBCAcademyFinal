@@ -1,7 +1,7 @@
 package com.example.tbcacademyfinal.di
 
-import com.example.tbcacademyfinal.data.util.ConnectivityObserverImpl
-import com.example.tbcacademyfinal.domain.util.ConnectivityObserver
+import com.example.tbcacademyfinal.data.repository.ConnectivityObserverImpl
+import com.example.tbcacademyfinal.domain.repository.ConnectivityObserver
 import dagger.Binds // Use @Binds for interface binding
 import dagger.Module
 import dagger.hilt.InstallIn

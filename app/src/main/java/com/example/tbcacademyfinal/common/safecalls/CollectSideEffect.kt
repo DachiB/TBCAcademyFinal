@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.common
+package com.example.tbcacademyfinal.common.safecalls
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect

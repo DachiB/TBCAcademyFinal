@@ -7,5 +7,5 @@ sealed interface RegisterIntent {
     data class ConfirmPasswordChanged(val confirmPassword: String) : RegisterIntent
     data object ConfirmPasswordVisibilityChanged : RegisterIntent
     data object RegisterClicked : RegisterIntent
-    data object NavigateBackClicked : RegisterIntent // Renamed for clarity
+    data object NavigateBackClicked : RegisterIntent
 }

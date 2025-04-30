@@ -11,6 +11,5 @@ class LogOutUseCase @Inject constructor(
     suspend operator fun invoke() {
         authRepository.logout()
         dataStoreRepository.setShouldRememberUser(false)
-        // Potentially clear other user-specific data/caches here if needed
     }
 }

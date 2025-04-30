@@ -9,6 +9,5 @@ data class ProductDto(
     @Json(name = "price") val price: Double? = 0.0,
     @Json(name = "image_url") val imageUrl: String? = "",
     @Json(name = "category") val category: String? = "",
-    @Json(name = "model_file") val modelFile: String? = "" // Asset path for AR model
-    // Add other fields as needed from API
+    @Json(name = "model_file") val modelFile: String? = ""
 )

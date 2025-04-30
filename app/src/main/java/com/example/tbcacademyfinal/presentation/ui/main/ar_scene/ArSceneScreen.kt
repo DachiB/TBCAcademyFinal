@@ -18,9 +18,12 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -35,11 +38,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.R
+import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.ui.main.ar_scene.components.CollectionThumbnail
 import com.google.android.filament.Engine
 import com.google.ar.core.Anchor
@@ -115,6 +120,7 @@ fun ArScreenContent(
         val cameraNode = rememberARCameraNode(engine)
         val childNodes = rememberNodes()
         val view = rememberView(engine)
+        val surfaceView = SurfaceView(context)
         val collisionSystem = rememberCollisionSystem(view)
 
         var planeRenderer by remember { mutableStateOf(true) }
@@ -189,6 +195,29 @@ fun ArScreenContent(
                 })
         )
 
+        FloatingActionButton(
+            onClick = {
+                captureArView(
+                    view = surfaceView,
+                    context = context,
+                    coroutineScope = coroutineScope,
+                    onBitmapReady = { bitmap -> onIntent(ArSceneIntent.PhotoCaptured(bitmap)) },
+                    onError = { errorMsg ->
+                        Log.e("ArScreen", "Capture Error: $errorMsg")
+                    }
+                )
+            },
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .systemBarsPadding()
+                .padding(16.dp),
+            containerColor = MaterialTheme.colorScheme.tertiaryContainer // Example color
+        ) {
+            Icon(
+                Icons.Filled.AddCircle,
+                contentDescription = stringResource(R.string.take_photo) // Add string
+            )
+        }
 
         IconButton(
             onClick = { onIntent(ArSceneIntent.GoBackClicked) },

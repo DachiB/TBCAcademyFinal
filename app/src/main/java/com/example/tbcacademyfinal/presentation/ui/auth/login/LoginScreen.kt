@@ -49,9 +49,8 @@ import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.tbcacademyfinal.R
-import com.example.tbcacademyfinal.common.CollectSideEffect
+import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import kotlinx.coroutines.delay
 
 @Composable
@@ -60,33 +59,30 @@ fun LoginScreen(
     onNavigateToMain: () -> Unit,
     onNavigateToRegister: () -> Unit
 ) {
-    // Side Effect collection remains the same
     CollectSideEffect(flow = viewModel.event) { effect ->
         when (effect) {
             is LoginSideEffect.NavigateToRegister -> onNavigateToRegister()
             is LoginSideEffect.NavigateToMain -> onNavigateToMain()
             is LoginSideEffect.ShowError -> {
-                println("Error: ${effect.message}") // Handle error display
+                println("Error: ${effect.message}")
             }
         }
     }
 
-    // Pass the processIntent lambda down
     LoginScreenContent(
-        state = viewModel.state, processIntent = viewModel::processIntent // Pass the intent processor
+        state = viewModel.state, processIntent = viewModel::processIntent
     )
 }
 
 @Composable
 fun LoginScreenContent(
     state: LoginState,
-    // Accept the intent processor function
     processIntent: (LoginIntent) -> Unit
 ) {
     var contentVisible by remember { mutableStateOf(false) }
 
     LaunchedEffect(Unit) {
-        delay(200) // Small delay before starting animation
+        delay(200)
         contentVisible = true
     }
 
@@ -149,7 +145,6 @@ fun LoginScreenContent(
             ) {
                 OutlinedTextField(
                     value = state.email,
-                    // Send EmailChanged intent on value change
                     onValueChange = { processIntent(LoginIntent.EmailChanged(it)) },
                     label = { Text(stringResource(R.string.email_label)) },
                     modifier = Modifier.fillMaxWidth(),
@@ -229,7 +224,7 @@ fun LoginScreenContent(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp), // Align with error message or spacer
+                        .padding(top = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.Center
                 ) {
@@ -240,9 +235,9 @@ fun LoginScreenContent(
                             )
                         )
                     }, enabled = !state.isLoading)
-                    // Make the text clickable to toggle the checkbox too
+
                     Text(
-                        text = stringResource(R.string.login_remember_me), // Add string
+                        text = stringResource(R.string.login_remember_me),
                         modifier = Modifier.clickable {
                             processIntent(
                                 LoginIntent.RememberMeChanged(
@@ -255,7 +250,7 @@ fun LoginScreenContent(
                     )
                 }
             }
-            val errorMessage = state.errorMessage // Prioritize validation error
+            val errorMessage = state.errorMessage
             if (errorMessage != null) {
                 Text(
                     text = state.errorMessage,
@@ -266,9 +261,9 @@ fun LoginScreenContent(
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.height(24.dp)) // Maintain space
+                Spacer(modifier = Modifier.height(24.dp))
             } else {
-                Spacer(modifier = Modifier.height(24.dp)) // Maintain space
+                Spacer(modifier = Modifier.height(24.dp))
             }
 
 
@@ -282,10 +277,9 @@ fun LoginScreenContent(
                 ) + slideInVertically(
                     initialOffsetY = { 40 },
                     animationSpec = tween(durationMillis = 800, delayMillis = 500)
-                ) // Slide from bottom
+                )
             ) {
                 Button(
-                    // Send LoginClicked intent on click
                     onClick = { processIntent(LoginIntent.LoginClicked) },
                     modifier = Modifier
                         .fillMaxWidth()
@@ -305,7 +299,6 @@ fun LoginScreenContent(
 
             Spacer(modifier = Modifier.height(24.dp))
 
-            // Register Link - Dispatch Intent
             AnimatedVisibility(
                 visible = contentVisible,
                 enter = fadeIn(
@@ -316,7 +309,7 @@ fun LoginScreenContent(
                 ) + slideInVertically(
                     initialOffsetY = { 40 },
                     animationSpec = tween(durationMillis = 800, delayMillis = 600)
-                ) // Slide from bottom
+                )
             ) {
                 Text(text = stringResource(R.string.register_prompt),
                     style = TextStyle(

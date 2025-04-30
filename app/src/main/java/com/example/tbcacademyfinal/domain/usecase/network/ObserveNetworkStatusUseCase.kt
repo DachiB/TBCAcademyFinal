@@ -1,6 +1,6 @@
 package com.example.tbcacademyfinal.domain.usecase.network
 
-import com.example.tbcacademyfinal.domain.util.ConnectivityObserver
+import com.example.tbcacademyfinal.domain.repository.ConnectivityObserver
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 

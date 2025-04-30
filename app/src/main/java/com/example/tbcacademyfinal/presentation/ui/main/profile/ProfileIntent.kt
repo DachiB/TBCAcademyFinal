@@ -5,9 +5,5 @@ sealed interface ProfileIntent {
     data object LogoutClicked : ProfileIntent
     data class ThemeChanged(val theme: Boolean) : ProfileIntent
     data class LanguageChanged(val language: String) : ProfileIntent
-
-
-    //TO-DO: Uncomment when needed
-//    data class ThemeChanged(val theme: ThemeType) : ProfileIntent
-//    data class LanguageChanged(val language: LanguageType) : ProfileIntent
+    data class DeletePhotoClicked(val photoUrl: String) : ProfileIntent
 }

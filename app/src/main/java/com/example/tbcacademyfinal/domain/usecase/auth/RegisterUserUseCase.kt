@@ -15,31 +15,24 @@ import javax.inject.Inject
 
 class RegisterUserUseCase @Inject constructor(
     private val authRepository: AuthRepository,
-    private val createUserProfileUseCase: CreateUserProfileUseCase // Inject profile creation use case
+    private val createUserProfileUseCase: CreateUserProfileUseCase
 ) {
     @OptIn(ExperimentalCoroutinesApi::class)
     suspend operator fun invoke(email: String, password: String): Flow<Resource<AuthResult>> {
-        // Chain the operations: Register -> Create Profile
         return authRepository.register(email, password).flatMapConcat { authResource ->
             when (authResource) {
                 is Resource.Success -> {
-                    // Auth success, now create Firestore profile
                     val firebaseUser = authResource.data.user
                     if (firebaseUser != null) {
-                        // Create domain User object WITH current time here
                         val newUser = User(
                             uid = firebaseUser.uid,
                             email = email,
                             createdAt = System.currentTimeMillis()
                         )
                         createUserProfileUseCase(newUser).map { profileResource ->
-                            // Map the profile creation result back to the original AuthResult Resource
                             when (profileResource) {
-                                // Profile creation success: return original Auth Success
                                 is Resource.Success -> Resource.Success(authResource.data)
-                                // Profile creation loading: keep showing Auth Success (or map to loading?)
                                 is Resource.Loading -> Resource.Success(authResource.data) // Or Resource.Loading? Decided Success is better UX
-                                // Profile creation error: Return an error, but registration succeeded technically
                                 is Resource.Error -> Resource.Error(
                                     message = "User registered, but failed to create profile: ${profileResource.message}",
                                     exception = profileResource.exception
@@ -47,11 +40,9 @@ class RegisterUserUseCase @Inject constructor(
                             }
                         }
                     } else {
-                        // Should not happen if Auth succeeded, but handle defensively
                         flow { emit(Resource.Error("Registration succeeded but user data was null.")) }
                     }
                 }
-                // If Auth failed or is Loading, pass the original resource through
                 is Resource.Error -> flow {
                     emit(
                         Resource.Error(

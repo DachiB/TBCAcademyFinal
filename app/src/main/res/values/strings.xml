@@ -59,4 +59,8 @@
     <string name="go_to_details">Go To Details</string>
     <string name="in_collection">In Collection</string>
     <string name="has_3d_model_only">Has 3D Model only</string>
+    <string name="take_photo">Take A Photo</string>
+    <string name="profile_photos_empty">No Photos Takes</string>
+    <string name="profile_photo_item_desc">Photo Item</string>
+    <string name="profile_delete_photo_desc">Delete Photo</string>
 </resources>

@@ -1,4 +1,4 @@
-package com.example.tbcacademyfinal.presentation.ui.main.profile.settings
+package com.example.tbcacademyfinal.presentation.ui.main.profile.components
 
 import android.util.Log
 import androidx.activity.ComponentActivity

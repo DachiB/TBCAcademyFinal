@@ -23,8 +23,8 @@ class PhotoUploadWorker @AssistedInject constructor(
     companion object {
         const val KEY_FILE_URI = "file_uri"
         const val KEY_UPLOAD_PATH = "upload_path"
-        const val KEY_RESULT_URL = "result_url" // Key for output data
-        const val KEY_RESULT_ERROR = "result_error" // Key for error message
+        const val KEY_RESULT_URL = "result_url"
+        const val KEY_RESULT_ERROR = "result_error"
     }
 
     override suspend fun doWork(): Result = withContext(Dispatchers.IO) {

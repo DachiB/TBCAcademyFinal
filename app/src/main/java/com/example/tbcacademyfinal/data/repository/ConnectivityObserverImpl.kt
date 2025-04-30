@@ -1,10 +1,10 @@
-package com.example.tbcacademyfinal.data.util
+package com.example.tbcacademyfinal.data.repository
 
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import com.example.tbcacademyfinal.domain.util.ConnectivityObserver
+import com.example.tbcacademyfinal.domain.repository.ConnectivityObserver
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -14,14 +14,13 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton // Add @Inject to constructor for @Binds
+@Singleton
 class ConnectivityObserverImpl @Inject constructor(
     @ApplicationContext private val context: Context
 ) : ConnectivityObserver {
     private val connectivityManager =
         context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-    // Helper function to check current status
     private fun getCurrentStatus(): ConnectivityObserver.Status {
         val activeNetwork =
             connectivityManager.activeNetwork ?: return ConnectivityObserver.Status.Lost
@@ -32,8 +31,7 @@ class ConnectivityObserverImpl @Inject constructor(
         ) {
             ConnectivityObserver.Status.Available
         } else {
-            // Consider cases like connecting but no internet validation yet
-            ConnectivityObserver.Status.Unavailable // Or Losing? Unavailable seems better
+            ConnectivityObserver.Status.Unavailable
         }
     }
 
@@ -45,13 +43,12 @@ class ConnectivityObserverImpl @Inject constructor(
                     launch { send(ConnectivityObserver.Status.Available) }
                 }
 
-                // ... other overrides (onLost, onUnavailable, onLosing) ...
                 override fun onLost(network: Network) {
                     super.onLost(network)
                     launch { send(ConnectivityObserver.Status.Lost) }
                 }
 
-                override fun onUnavailable() { // This is called when WIFI connects but has no internet access
+                override fun onUnavailable() {
                     super.onUnavailable()
                     launch { send(ConnectivityObserver.Status.Unavailable) }
                 }
@@ -68,21 +65,9 @@ class ConnectivityObserverImpl @Inject constructor(
             awaitClose {
                 connectivityManager.unregisterNetworkCallback(callback)
             }
-        }.distinctUntilChanged() // Keep distinctUntilChanged
+        }.distinctUntilChanged()
     }
 }
-
-//            override fun onLost(network: Network) {
-//                super.onLost(network)
-//            }
-//
-//            override fun onLosing(network: Network, maxMsToLive: Int) {
-//                super.onLosing(network, maxMsToLive)
-//            }
-//
-//            override fun onUnavailable() {
-//                super.onUnavailable()
-//            }
 
 
 
