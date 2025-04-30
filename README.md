@@ -19,7 +19,7 @@ AR Home Designer is an Android application built with Jetpack Compose and SceneV
 - **Persistence:** Room, DataStore
 - **Backend:** Firebase Auth, Firestore, Firebase Storage
 - **Testing:** JUnit, Mockito, Coroutine Test
-- 
+
 ## Getting Started
 
 1. Clone the repository

@@ -44,7 +44,6 @@ fun AppNavGraph(
             )
         }
 
-        // 2. Landing Screen (Top Level)
         composable<Routes.LandingRoute> {
             LandingScreen(
                 onNavigateToTutorial = {
