@@ -119,7 +119,7 @@ fun DetailsScreenContent(
                     containerColor = MaterialTheme.colorScheme.surface,
                     titleContentColor = MaterialTheme.colorScheme.onSurface,
                     navigationIconContentColor = MaterialTheme.colorScheme.onSurface
-                )
+                ),
             )
         }
     ) { paddingValues ->

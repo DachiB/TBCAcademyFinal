@@ -16,9 +16,8 @@ import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton // Make repository singleton
+@Singleton
 class ProductRepositoryImpl @Inject constructor(
-    // Inject ApiService even for fake implementation to prepare for switch
     private val apiService: ProductApiService
 ) : ProductRepository {
 

@@ -2,6 +2,8 @@ package com.example.tbcacademyfinal.presentation.ui.main.profile
 
 import android.annotation.SuppressLint
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -34,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -41,6 +44,8 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
+import com.example.tbcacademyfinal.presentation.theme.GreenLinearGradient
+import com.example.tbcacademyfinal.presentation.theme.PlainWhite
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import com.example.tbcacademyfinal.presentation.ui.main.profile.components.LanguageToggleButton
 import com.example.tbcacademyfinal.presentation.ui.main.profile.components.PhotoItem
@@ -76,9 +81,10 @@ fun ProfileScreen(
                     Text(text = stringResource(R.string.profile_title))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                    containerColor = Color.Transparent,
+                    titleContentColor = PlainWhite
+                ),
+                modifier = Modifier.background(GreenLinearGradient)
             )
         }
     ) { paddingValues ->
@@ -102,26 +108,125 @@ fun ProfileScreenContent(
             .fillMaxSize()
             .padding(16.dp),
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
-        Row(
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .align(Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
+                .border(
+                    width = 2.dp,
+                    color = MaterialTheme.colorScheme.secondary,
+                    shape = MaterialTheme.shapes.medium
+                )
+                .background(
+                    color = MaterialTheme.colorScheme.secondaryContainer,
+                    shape = MaterialTheme.shapes.medium
+                )
+                .padding(
+                    16.dp
+                )
         ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
 
-            LanguageToggleButton(
-                modifier = Modifier.align(Alignment.CenterVertically),
-                state, processIntent
-            )
-            ThemeSwitcher(
-                size = 50.dp,
-                padding = 4.dp,
-                darkTheme = state.isDarkTheme,
-                onClick = { processIntent(ProfileIntent.ThemeChanged(state.isDarkTheme)) }
-            )
+                Text(
+                    text = "Theme:",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+                ThemeSwitcher(
+                    size = 50.dp,
+                    padding = 4.dp,
+                    darkTheme = state.isDarkTheme,
+                    onClick = { processIntent(ProfileIntent.ThemeChanged(state.isDarkTheme)) }
+                )
 
+            }
+            Spacer(
+                modifier = Modifier
+                    .height(16.dp)
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .align(Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = "Language:",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+
+                LanguageToggleButton(
+                    modifier = Modifier.align(Alignment.CenterVertically),
+                    state, processIntent
+                )
+
+
+            }
+        }
+
+        Spacer(
+            modifier = Modifier
+                .height(16.dp)
+        )
+
+        Text(
+            text = "Your Screenshots:",
+            style = MaterialTheme.typography.headlineSmall,
+            modifier = Modifier.padding(bottom = 16.dp).align(
+                Alignment.CenterHorizontally
+            )
+        )
+        
+        when {
+            state.isLoadingPhotos -> {
+                CircularProgressIndicator(modifier = Modifier.padding(vertical = 16.dp))
+            }
+
+            state.photosError != null -> {
+                Text(
+                    text = "Error loading photos: ${state.photosError}",
+                    color = MaterialTheme.colorScheme.error,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.padding(vertical = 16.dp)
+                )
+            }
+
+            state.photos.isEmpty() -> {
+                Text(
+                    text = stringResource(R.string.profile_photos_empty),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(vertical = 16.dp).align(
+                        Alignment.CenterHorizontally
+                    )
+                )
+            }
+
+            else -> {
+                LazyVerticalGrid(
+                    columns = GridCells.Adaptive(minSize = 100.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(max = 300.dp),
+                    contentPadding = PaddingValues(vertical = 8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(state.photos, key = { url -> url }) { photoUrl ->
+                        PhotoItem(imageUrl = photoUrl, onDeleteClick = {
+                            processIntent(ProfileIntent.DeletePhotoClicked(photoUrl.toString()))
+                        })
+                    }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+
+
+            }
         }
 
         if (state.isLoading) {
@@ -167,49 +272,7 @@ fun ProfileScreenContent(
             }
 
             Spacer(modifier = Modifier.height(16.dp))
-            when {
-                state.isLoadingPhotos -> {
-                    CircularProgressIndicator(modifier = Modifier.padding(vertical = 16.dp))
-                }
 
-                state.photosError != null -> {
-                    Text(
-                        text = "Error loading photos: ${state.photosError}",
-                        color = MaterialTheme.colorScheme.error,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    )
-                }
-
-                state.photos.isEmpty() -> {
-                    Text(
-                        text = stringResource(R.string.profile_photos_empty),
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = 16.dp)
-                    )
-                }
-
-                else -> {
-                    LazyVerticalGrid(
-                        columns = GridCells.Adaptive(minSize = 100.dp),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 300.dp),
-                        contentPadding = PaddingValues(vertical = 8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        items(state.photos, key = { url -> url }) { photoUrl ->
-                            PhotoItem(imageUrl = photoUrl.toString(), onDeleteClick = {
-                                processIntent(ProfileIntent.DeletePhotoClicked(photoUrl.toString()))
-                            })
-                        }
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-
-
-                }
-            }
         }
     }
 }

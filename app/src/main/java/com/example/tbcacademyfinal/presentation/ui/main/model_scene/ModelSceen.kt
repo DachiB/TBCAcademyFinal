@@ -3,6 +3,7 @@ package com.example.tbcacademyfinal.presentation.ui.main.model_scene
 import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -21,10 +22,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
+import com.example.tbcacademyfinal.presentation.theme.GreenLinearGradient
+import com.example.tbcacademyfinal.presentation.theme.PlainWhite
 import io.github.sceneview.Scene
 import io.github.sceneview.animation.Transition.animateRotation
 import io.github.sceneview.math.Position
@@ -81,10 +85,11 @@ fun ModelContent(
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color.Transparent,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                ),
+                modifier = Modifier.background(GreenLinearGradient)
             )
         }
     ) { paddingValues ->

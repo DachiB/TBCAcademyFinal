@@ -51,7 +51,7 @@ fun TutorialContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(32.dp),
 
         ) {
         if (!state.hasClickedNextTutorial) {
@@ -168,7 +168,10 @@ fun TutorialContent(
 @Composable
 fun TutorialScreenPreview() {
     TutorialContent(
-        state = TutorialState(),
+        state = TutorialState(
+            hasClickedNextTutorial = true,
+            contentVisible = true
+        ),
         onIntent = {}
     )
 }

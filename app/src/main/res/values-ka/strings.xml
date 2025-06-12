@@ -52,4 +52,14 @@
     <string name="no_such_product_s">ვერმოიძებნა მსგავსი პროდუქტი</string>
     <string name="buy_collection">იყიდე კოლექცია</string>
     <string name="view_model_in_3d">ნახე 3დ ვერსია</string>
+    <string name="finish_tutorial">დაასრულე ტუტორიალი</string>
+    <string name="view_details">იხილე დეტალები</string>
+    <string name="collection_of_day">დღის კოლექცია</string>
+    <string name="go_to_details">დეტალებში გადასვლა</string>
+    <string name="in_collection">არის კოლექციაში</string>
+    <string name="has_3d_model_only">აქვს 3დ მოდელი</string>
+    <string name="take_photo">გადაიღე ფოტო</string>
+    <string name="profile_photos_empty">ფოტოები არ არის</string>
+    <string name="profile_photo_item_desc">ფოტო</string>
+    <string name="profile_delete_photo_desc">წაშალე ფოტო</string>
 </resources>

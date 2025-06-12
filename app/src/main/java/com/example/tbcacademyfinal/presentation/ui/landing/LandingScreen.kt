@@ -69,7 +69,6 @@ fun LandingScreenContent(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
             .background(color = MaterialTheme.colorScheme.background),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween

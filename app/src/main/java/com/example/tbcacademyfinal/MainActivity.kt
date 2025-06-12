@@ -26,11 +26,12 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
+            val navController = rememberNavController()
+
             val darkTheme by dataStoreRepo.getAppTheme()
                 .collectAsState(initial = isSystemInDarkTheme())
 
             TBCAcademyFinalTheme(darkTheme = darkTheme) {
-                val navController = rememberNavController()
                 AppNavGraph(navController)
             }
         }

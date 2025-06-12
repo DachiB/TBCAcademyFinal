@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,6 +37,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -44,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.tbcacademyfinal.R
 import com.example.tbcacademyfinal.common.safecalls.CollectSideEffect
 import com.example.tbcacademyfinal.presentation.model.ProductUi
+import com.example.tbcacademyfinal.presentation.theme.GreenLinearGradient
 import com.example.tbcacademyfinal.presentation.theme.PlainWhite
 import com.example.tbcacademyfinal.presentation.theme.TBCAcademyFinalTheme
 import com.example.tbcacademyfinal.presentation.ui.main.store.components.CategoryRow
@@ -83,9 +86,10 @@ fun StoreScreen(
                     Text(text = stringResource(R.string.app_name))
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
+                    containerColor = Color.Transparent,
                     titleContentColor = PlainWhite
-                )
+                ),
+                modifier = Modifier.background(GreenLinearGradient)
             )
         }
     ) { paddingValues ->

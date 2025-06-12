@@ -7,5 +7,5 @@ object PreferencesKeys {
     val SEEN_LANDING = booleanPreferencesKey("has_seen_landing")
     val SHOULD_REMEMBER_USER = booleanPreferencesKey("remember_user")
     val DARK_THEME_KEY = booleanPreferencesKey("dark_theme")
-    val LANGUAGE_KEY = stringPreferencesKey("language") // Store enum name as String
+    val LANGUAGE_KEY = stringPreferencesKey("language")
 }

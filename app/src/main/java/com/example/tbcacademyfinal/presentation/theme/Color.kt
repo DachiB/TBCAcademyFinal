@@ -1,5 +1,6 @@
 package com.example.tbcacademyfinal.presentation.theme
 
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
 // Suggested Palette
@@ -11,6 +12,11 @@ val GoldAccent = Color(0xFFDAA520)
 val DarkSurface = Color(0xFF1C1B1F) // Example Dark theme surface
 val DarkBackground = Color(0xFF121212) // Example Dark theme background
 val GreenVariant = Color(0xFF588157) // Lighter green for accents/secondary
+val DarkerGreenVariant = Color(0xFF5A9A59)
+
+val GreenLinearGradient = Brush.horizontalGradient(
+    colors = listOf(ForestGreen, DarkerGreenVariant)
+)
 
 // Add other specific colors as needed (Error, OnPrimary, OnSecondary etc.)
 val LightOnError = Color.White

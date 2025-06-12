@@ -34,7 +34,7 @@ fun MainScreen(
     ) { innerPadding ->
         NavHost(
             navController = bottomBarNavController,
-            startDestination = Routes.StoreRoute, // Use the actual @Serializable object/class
+            startDestination = Routes.StoreRoute,
             modifier = Modifier.padding(innerPadding)
         ) {
             composable<Routes.StoreRoute> {
